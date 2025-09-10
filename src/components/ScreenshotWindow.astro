@@ -1,30 +1,66 @@
 ---
-    type Props = { lightScreenshot: string; darkScreenshot: string, tilt?: number, hoverTilt? : number, hoverOffset? : number};
-    const {
-        lightScreenshot,
-        darkScreenshot,
-        tilt = 4,
-        hoverTilt = 2.5,
-        hoverOffset = -4
-    }: Props = Astro.props;
-    let style = `--tilt: ${tilt}deg; --negative-tilt: ${tilt * -1}deg; --hover-tilt: ${hoverTilt}deg; --hover-offset: ${hoverOffset}px;`;
-    const elId = `sc-${Math.random().toString(36).slice(2)}`;
+type Props = {
+    lightScreenshot: string;
+    darkScreenshot: string;
+    tilt?: number;
+    hoverTilt?: number;
+    hoverOffset?: number;
+};
+const {
+    lightScreenshot,
+    darkScreenshot,
+    tilt = 4,
+    hoverTilt = 2.5,
+    hoverOffset = -4,
+}: Props = Astro.props;
+let style = `--tilt: ${tilt}deg; --negative-tilt: ${tilt * -1}deg; --hover-tilt: ${hoverTilt}deg; --hover-offset: ${hoverOffset}px;`;
 ---
-<figure class="screenshot-tilt m-0" style={style}>
-    <img id={elId} src={darkScreenshot} alt="Product screenshot" class="img-fluid" />
+
+<figure class="screenshot-tilt m-0 stack" style={style}>
+    <img
+        src={lightScreenshot}
+        alt="Product screenshot"
+        class="img-fluid lightscreenshot"
+    />
+    <img
+        src={darkScreenshot}
+        alt="Product screenshot"
+        class="img-fluid darkscreenshot"
+    />
 </figure>
 
+<script>
+    import { subscribe, resolve } from "../lib/theme";
+    const lights = document.getElementsByClassName("lightscreenshot");
+    const darks = document.getElementsByClassName("darkscreenshot");
 
-<script type="module" define:vars={{elId, lightScreenshot, darkScreenshot}}>
-  import { subscribe, resolve } from '/src/lib/theme.ts';
-  const el = document.getElementById(elId);
-
-  subscribe((v) => {
-    const mode = resolve(v);
-    el.src = mode === 'dark' ? darkScreenshot : lightScreenshot;
-  });
+    subscribe((v) => {
+        const mode = resolve(v);
+        if (mode === "dark") {
+            for (let light of lights) {
+                light.classList.add("invisible");
+            }
+            for (let dark of darks) {
+                dark.classList.remove("invisible");
+            }
+        } else {
+            for (let dark of darks) {
+                dark.classList.add("invisible");
+            }
+            for (let light of lights) {
+                light.classList.remove("invisible");
+            }
+        }
+    });
 </script>
 <style>
+    .stack {
+        display: grid;
+    }
+    .stack img {
+        grid-column: 1;
+        grid-row: 1;
+    }
     .screenshot-tilt {
         position: relative;
         width: clamp(260px, 42vw, 560px);
@@ -81,6 +117,12 @@
         pointer-events: none;
     }
 
+    .invisible {
+        display: none;
+        visibility: collapse;
+        max-height: 0;
+    }
+
     @media (hover: hover) {
         .screenshot-tilt {
             transition:
@@ -96,8 +138,6 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.85);
         }
     }
-
-
 
     :global([data-bs-theme="dark"]) .screenshot-tilt {
         background: #0f1320;
