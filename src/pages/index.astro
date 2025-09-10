@@ -1,128 +1,81 @@
 ---
+import Footer from "../components/Footer.astro";
 import Navbar from "../components/Navbar.astro";
 import AFOQTSection from "../components/sections/AFOQTSection.astro";
 import FeaturesSection from "../components/sections/FeaturesSection.astro";
 import MainHeroSection from "../components/sections/MainHeroSection.astro";
+import Root from "../layouts/Root.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<link
-			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-			rel="stylesheet"
-			integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-			crossorigin="anonymous"
-		/>
-		<script
-			src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-			integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-			crossorigin="anonymous"></script>
-		<link
-			rel="stylesheet"
-			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css"
-		/>
-		<script is:inline>
-			(function () {
-				try {
-					var saved = localStorage.getItem("theme");
-					var parsed = saved ? JSON.parse(saved) : "system";
-					var prefersDark = matchMedia(
-						"(prefers-color-scheme: dark)",
-					).matches;
-					var mode =
-						parsed === "system"
-							? prefersDark
-								? "dark"
-								: "light"
-							: parsed;
-					document.documentElement.dataset.theme = mode;
-					document.documentElement.setAttribute('data-bs-theme', mode);
-				} catch {}
-			})();
-		</script>
-	</head>
+<Root>
+	<body>
+		<div class="main-content">
+			<Navbar />
+			<MainHeroSection />
+			<FeaturesSection />
 
-	<title>OATTS</title>
-</html>
-<body>
-	<div class="main-content">
-		<Navbar />
-		<MainHeroSection />
-		<FeaturesSection />
-
-		<section class="section-muted py-5">
-			<AFOQTSection />
-		</section>
-	</div>
-
-	<footer class="py-5 text-center text-muted small">
-		<div class="container">© 2025 U.S. Air Force & DCS Corp.</div>
-		<div class="container">
-			Distribution Statement A: Approved For Public Release. AFRL,
-			2025-4499, Cleared 08 Sep 2025
+			<section class="section-muted py-5">
+				<AFOQTSection />
+			</section>
 		</div>
-	</footer>
-</body>
 
-<style>
-	:root {
-		--hero-grad-start: #7b2ff7;
-		--hero-grad-end: #f107a3;
-		--brand-purple: #6f42c1;
-		--soft-bg: #f8f9fc;
-	}
-	.theme-transition * {
-		transition:
-			background-color 0.25s ease,
-			color 0.25s ease,
-			border-color 0.25s ease,
-			box-shadow 0.25s ease,
-			fill 0.25s ease,
-			stroke 0.25s ease;
-	}
+		<Footer />
+	</body>
 
-	@media (prefers-reduced-motion: reduce) {
-		.theme-transition * {
-			transition: none !important;
+	<style>
+		:root {
+			--hero-grad-start: #7b2ff7;
+			--hero-grad-end: #f107a3;
 		}
-	}
+		.theme-transition * {
+			transition:
+				background-color 0.25s ease,
+				color 0.25s ease,
+				border-color 0.25s ease,
+				box-shadow 0.25s ease,
+				fill 0.25s ease,
+				stroke 0.25s ease;
+		}
 
-	.main-content {
-		background: radial-gradient(
-				1200px 400px at right -100px,
-				rgba(111, 66, 193, 0.15),
-				transparent
-			),
-			radial-gradient(
-				600px 300px at 30% 10%,
-				rgba(123, 47, 247, 0.1),
-				transparent
-			);
-	}
+		@media (prefers-reduced-motion: reduce) {
+			.theme-transition * {
+				transition: none !important;
+			}
+		}
 
-	/* Install section */
-	.section-muted {
-		background: var(--soft-bg);
-	}
+		.main-content {
+			background: radial-gradient(
+					1200px 400px at right -100px,
+					rgba(111, 66, 193, 0.15),
+					transparent
+				),
+				radial-gradient(
+					600px 300px at 30% 10%,
+					rgba(123, 47, 247, 0.1),
+					transparent
+				);
+		}
 
-	:global([data-bs-theme="dark"]) .section-muted {
-		background: #121622;
-	}
+		/* Install section */
+		.section-muted {
+			background: var(--soft-bg);
+		}
 
-	:global([data-bs-theme="dark"]) .main-content {
-		background: radial-gradient(
-				1200px 400px at right -100px,
-				rgba(123, 47, 247, 0.12),
-				transparent
-			),
-			radial-gradient(
-				600px 300px at 30% 10%,
-				rgba(123, 47, 247, 0.08),
-				transparent
-			);
-	}
-</style>
+		:global([data-bs-theme="dark"]) .section-muted {
+			background: #121622;
+		}
+
+		:global([data-bs-theme="dark"]) .main-content {
+			background: radial-gradient(
+					1200px 400px at right -100px,
+					rgba(123, 47, 247, 0.12),
+					transparent
+				),
+				radial-gradient(
+					600px 300px at 30% 10%,
+					rgba(123, 47, 247, 0.08),
+					transparent
+				);
+		}
+	</style>
+</Root>
