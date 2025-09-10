@@ -37,14 +37,14 @@
     </div>
 </nav>
 
-<script type="module">
-  import { getTheme, setTheme, subscribe, resolve } from '/src/lib/theme.ts';
+<script>
+  import { getTheme, setTheme, subscribe, resolve, type Theme } from '../lib/theme';
 
   const btn = document.getElementById('themeToggle');
   const switchIcon = document.getElementById('themeSwitchIcon');
 
-  let themeOrder = ['system', 'dark', 'light']
-  function next(v) {
+  let themeOrder : Theme[] = ['system', 'dark', 'light']
+  function next(v: Theme) {
     
     return themeOrder[(themeOrder.indexOf(v) + 1 )% 3];
   }
@@ -53,18 +53,16 @@
     const theme = resolve(v);
     console.log(v);
     
-    btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
-    btn.classList.add(theme === 'light'? 'btn-outline-dark' : 'btn-outline-light')
-    btn.classList.remove(theme === 'light'?  'btn-outline-light' : 'btn-outline-dark')
+    btn?.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    btn?.classList.add(theme === 'light'? 'btn-outline-dark' : 'btn-outline-light')
+    btn?.classList.remove(theme === 'light'?  'btn-outline-light' : 'btn-outline-dark')
     let priorTheme = themeOrder[(themeOrder.indexOf(v) - 1) % 3];
-    let toIcon = (theme) => theme === 'system'? 'bi-laptop' : (theme === 'dark'? 'bi-moon' : 'bi-sun') 
-    switchIcon.classList.add(toIcon(v));
-    switchIcon.classList.remove(toIcon(priorTheme));
+    let toIcon = (theme: Theme) => theme === 'system'? 'bi-laptop' : (theme === 'dark'? 'bi-moon' : 'bi-sun') 
+    switchIcon?.classList.add(toIcon(v));
+    switchIcon?.classList.remove(toIcon(priorTheme));
   });
 
-  btn.addEventListener('click', () => setTheme(next(getTheme())));
-
-
+  btn?.addEventListener('click', () => setTheme(next(getTheme())));
 
   window.addEventListener('astro:after-swap', unsub, { once: true });
 </script>
