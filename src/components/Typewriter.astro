@@ -1,0 +1,99 @@
+---
+// Typewriter.astro
+interface Props {
+  words: string[];
+  typingSpeed?: number;
+  deletingSpeed?: number;
+  pauseBetween?: number;
+  pauseAfter?: number;
+  loop?: boolean;
+  class?: string;
+}
+
+const {
+  words = [],
+  typingSpeed = 90,
+  deletingSpeed = 80,
+  pauseBetween = 2000,
+  pauseAfter = 100,
+  loop = true,
+  class: className = '',
+} = Astro.props;
+
+const elId = `tw-${Math.random().toString(36).slice(2)}`;
+---
+
+<span id={elId} class={`typewriter ${className}`} aria-live="polite" role="status"><span class="content"></span><span class="cursor" aria-hidden="true"></span></span>
+
+<script define:vars={{ words, typingSpeed, deletingSpeed, pauseBetween, pauseAfter, loop, elId }}>
+  // All vars above are now available in this script block.
+  const CFG = { words, typingSpeed, deletingSpeed, pauseBetween, pauseAfter, loop, elId };
+
+  (function initTypewriter(cfg) {
+    const el = document.getElementById(cfg.elId);
+    if (!el) return;
+    const content = el.querySelector('.content');
+
+    let index = 0;
+    let cancelToken = 0;
+
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    async function cycle(myToken) {
+      if (!cfg.words.length) return;
+
+      const maxCycles = cfg.loop ? Number.POSITIVE_INFINITY : cfg.words.length;
+      let cycles = 0;
+
+      while (cycles < maxCycles) {
+        const word = cfg.words[index];
+
+        // type
+        for (let i = 1; i <= word.length; i++) {
+          if (myToken !== cancelToken) return;
+          content.textContent = word.slice(0, i);
+          await sleep(cfg.typingSpeed);
+        }
+
+        await sleep(cfg.pauseBetween);
+
+        // delete
+        for (let i = word.length - 1; i >= 0; i--) {
+          if (myToken !== cancelToken) return;
+          content.textContent = word.slice(0, i);
+          await sleep(cfg.deletingSpeed);
+        }
+
+        await sleep(cfg.pauseAfter);
+
+        index = (index + 1) % cfg.words.length;
+        cycles++;
+      }
+    }
+
+    cancelToken++;
+    content.textContent = '';
+    index = 0;
+    cycle(cancelToken);
+  })(CFG);
+</script>
+
+<style>
+  .typewriter {
+    color: var(--bs-primary);
+    white-space: pre;
+  }
+  .cursor {
+    display: inline-block;
+    width: 0.08em;
+    height: 1em;
+    margin-left: 0.06em;
+    vertical-align: -0.1em;
+    background: currentColor;
+    animation: blink 1s steps(1, end) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .cursor { animation: none; }
+  }
+</style>

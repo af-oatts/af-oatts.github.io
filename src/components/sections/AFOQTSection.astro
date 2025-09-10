@@ -1,0 +1,74 @@
+---
+import ScreenshotWindow from "../ScreenshotWindow.astro";
+import Typewriter from "../Typewriter.astro";
+
+---
+<!-- Hero -->
+<section class="hero py-7">
+    <div class="container py-5">
+        <div class="row align-items-center gy-6">
+            <div
+                class="col-lg-5 d-none d-lg-flex justify-content-lg-center justify-content-start"
+            >
+                <ScreenshotWindow
+                    darkScreenshot='/Screenshot2-Dark.png'
+                    lightScreenshot='/Screenshot2-Light.png'
+                    tilt={-4}
+                    hoverTilt={-2.5}
+                    hoverOffset={4}
+                ></ScreenshotWindow>
+            </div>
+            <div class="col-lg-7">
+                <h2 class="hero-header mb-3">
+                    Built for <Typewriter words={["pilots", "cadets", "officers", "students", "AF-ROTC"]}/>
+                </h2>
+                <p class="hero-lead mb-4">
+                OATTS is an invaluable resource for students and professionals across a wide array of disciplines. For those preparing to take the AFOQT or TBAS, OATTS provides an excellent pre‑familiarization platform that enhances readiness and confidence. Developed in close collaboration with USAFA, AF-ROTC and AFPC, OATTS is engineered to meet the needs of a broad user base and to be fast, easy, and accessible to all.
+
+                </p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hero {
+        background: transparent;
+    }
+
+    .py-7 {
+        padding-top: 6rem;
+        padding-bottom: 6rem;
+    }
+
+    .hero-title {
+        font-size: clamp(2.2rem, 3.8vw + 1rem, 3.75rem);
+        font-weight: 800;
+    }
+
+    .hero-lead {
+        font-size: 1.125rem;
+        color: #495057;
+    }
+
+    .btn-xl {
+        padding: 1rem 2rem;
+        font-size: 1.25rem;
+        border-radius: 0.5rem;
+    }
+
+    .btn-xxl {
+        padding: 1rem 5rem;
+        font-size: 1.25rem;
+        border-radius: 0.5rem;
+    }
+
+    :global([data-bs-theme="dark"]) .hero {
+        background: transparent;
+    }
+
+    :global([data-bs-theme="dark"]) .hero-lead {
+        color: #b8c1d1;
+    }
+</style>

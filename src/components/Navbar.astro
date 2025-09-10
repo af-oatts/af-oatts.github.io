@@ -1,0 +1,129 @@
+
+<nav class="navbar navbar-expand-lg py-4">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+            <img src="/icon.png" style="height: 40px; width: auto;" alt="logo" />
+            <span class="fw-semibold">OATTS</span>
+        </a>
+
+        <button
+            class="navbar-toggler text-body border-0"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#nav"
+        >
+            <i class="bi bi-list" style="font-size:1.5rem;"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav me-auto ms-2">
+            </ul>
+
+            <div class="d-flex align-items-center gap-3">
+                <button
+                    id="themeToggle"
+                    class={"btn d-flex align-items-center gap-2" }
+                    type="button"
+                    onclick=""
+                    aria-label="Toggle theme"
+                    title="Toggle theme"
+                >
+                    <i id="themeSwitchIcon" class="bi"></i>
+                   
+                </button>
+                <a class="btn btn-primary" href="#">Coming Soon</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script type="module">
+  import { getTheme, setTheme, subscribe, resolve } from '/src/lib/theme.ts';
+
+  const btn = document.getElementById('themeToggle');
+  const switchIcon = document.getElementById('themeSwitchIcon');
+
+  let themeOrder = ['system', 'dark', 'light']
+  function next(v) {
+    
+    return themeOrder[(themeOrder.indexOf(v) + 1 )% 3];
+  }
+
+  const unsub = subscribe((v) => {
+    const theme = resolve(v);
+    console.log(v);
+    
+    btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    btn.classList.add(theme === 'light'? 'btn-outline-dark' : 'btn-outline-light')
+    btn.classList.remove(theme === 'light'?  'btn-outline-light' : 'btn-outline-dark')
+    let priorTheme = themeOrder[(themeOrder.indexOf(v) - 1) % 3];
+    let toIcon = (theme) => theme === 'system'? 'bi-laptop' : (theme === 'dark'? 'bi-moon' : 'bi-sun') 
+    switchIcon.classList.add(toIcon(v));
+    switchIcon.classList.remove(toIcon(priorTheme));
+  });
+
+  btn.addEventListener('click', () => setTheme(next(getTheme())));
+
+
+
+  window.addEventListener('astro:after-swap', unsub, { once: true });
+</script>
+
+<style>
+  .btn { padding: .5rem .8rem; border-radius: .5rem; }
+</style>
+
+
+
+<style>
+    /* Top bar */
+    .navbar {
+        background: transparent;
+    }
+
+    .navbar-blur {
+        backdrop-filter: none;
+        background: transparent !important;
+    }
+
+    .navbar .nav-link,
+    .navbar .navbar-brand {
+        color: var(--bs-body-color) !important;
+    }
+
+    .navbar .nav-link:hover {
+        color: var(--bs-link-hover-color) !important;
+    }
+
+    /* Larger navbar controls */
+    .navbar .nav-link {
+        font-size: 1.05rem;
+    }
+
+    .navbar .navbar-brand {
+        font-size: 1.125rem;
+    }
+
+    .navbar .navbar-brand img {
+        height: 40px;
+    }
+
+    .navbar .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+        border-radius: 0.6rem;
+    }
+
+    .navbar .navbar-toggler i {
+        font-size: 1.75rem;
+    }
+
+    [data-bs-theme="dark"] .navbar-blur {
+        background: linear-gradient(
+            90deg,
+            #3b2a6b 0%,
+            #4c2ea6 60%,
+            #5a35be 100%
+        );
+    }
+</style>
