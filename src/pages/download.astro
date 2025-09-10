@@ -5,10 +5,13 @@ import Root from "../layouts/Root.astro";
 import Footer from "../components/Footer.astro";
 import DownloadCard from "../components/DownloadCard.astro";
 import Downloaded from "../components/Downloaded.astro";
+import DownloadRoot from "../layouts/DownloadRoot.astro";
+import {navigate} from 'astro:transitions/client';
 ---
 
-<Root>
-    <Navbar />
+<DownloadRoot>
+
+    <a id="invisibleRedirector" style="display: none;" href="/installed/windows"></a>
     <section style="height:100vh;">
         <DotBackground fadeInset={400}>
             <!-- BEFORE view -->
@@ -16,16 +19,7 @@ import Downloaded from "../components/Downloaded.astro";
                 <DownloadCard />
             </div>
 
-            <!-- AFTER view: pre-render all OS variants, show one on swap -->
-            <div id="after" class="d-none opacity-0 transition-fade">
-                <div data-os="windows"><Downloaded os="windows" /></div>
-                <div data-os="macos_arm"><Downloaded os="macos_arm" /></div>
-                <div data-os="macos_intel"><Downloaded os="macos_intel" /></div>
-                <div data-os="linux_appimage">
-                    <Downloaded os="linux" />
-                </div>
-            </div>
-
+          
             <style>
                 .transition-fade {
                     transition: opacity 1.5s ease;
@@ -34,14 +28,10 @@ import Downloaded from "../components/Downloaded.astro";
                     opacity: 0 !important;
                     pointer-events: none;
                 }
-                .is-fade-in {
-                    opacity: 1 !important;
-                }
             </style>
 
-            <script is:inline>
+            <script is:inline define:vars={{navigate}}>
                 const before = document.getElementById("before");
-                const after = document.getElementById("after");
 
                 const sectionEl =
                     document.currentScript.closest("section") ||
@@ -54,29 +44,13 @@ import Downloaded from "../components/Downloaded.astro";
                     if (sectionEl) sectionEl.classList.add("is-fade-out");
 
                     setTimeout(() => {
-                        if (before) before.remove();
-
-                        after.querySelectorAll("[data-os]").forEach((node) => {
-                            node.style.display =
-                                node.getAttribute("data-os") === os
-                                    ? "block"
-                                    : "none";
-                        });
-                        after.classList.remove("d-none");
-
-                        void after.offsetWidth;
-                        after.classList.add("is-fade-in");
-
-                        if (sectionEl) {
-                            sectionEl.classList.remove("is-fade-out");
-
-                            void sectionEl.offsetWidth;
-                            sectionEl.classList.add("is-fade-in");
-                        }
-                    }, 1000);
+                        document.getElementById('invisibleRedirector')?.click();
+                    }, 1500);
+                    setTimeout(() => {
+                        
+                    }, 1600)
                 });
             </script>
         </DotBackground>
     </section>
-    <Footer />
-</Root>
+</DownloadRoot>

@@ -4,6 +4,7 @@ const { title = "OATTS" } = Astro.props;
 
 <html lang="en">
     <head>
+        <slot name="head"/>
         <meta charset="utf-8" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width" />
@@ -23,8 +24,9 @@ const { title = "OATTS" } = Astro.props;
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css"
         />
         <script is:inline>
-            (function () {
+            function syncTheme() {
                 try {
+                    
                     var saved = localStorage.getItem("theme");
                     var parsed = saved ? JSON.parse(saved) : "system";
                     var prefersDark = matchMedia(
@@ -42,7 +44,9 @@ const { title = "OATTS" } = Astro.props;
                         mode,
                     );
                 } catch {}
-            })();
+            }
+            syncTheme();
+            document.addEventListener('astro:after-swap', syncTheme);
         </script>
         <style>
             :root {

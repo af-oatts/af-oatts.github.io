@@ -6,17 +6,11 @@ interface Step {
   body?: string;
 }
 
-interface Props {
-  os: "windows" | "macos_arm" | "macos_intel" | "linux";
-  retryUrl?: string;
-  version?: string;
+type Props = {
+    os: string
 }
 
-const {
-  os,
-  retryUrl = "/download",
-  version,
-} = Astro.props as Props;
+const {os} = Astro.props;
 
 const osLabel = {
   windows: "Windows",
@@ -24,6 +18,7 @@ const osLabel = {
   macos_intel: "macOS (Intel)",
   linux: "Linux"
 }[os] ?? os;
+let retryUrl = '';
 
 
 
@@ -35,7 +30,7 @@ const steps: Step[] = [];
     <div class="col-12 col-lg-10 col-xxl-9">
       <div class="card shadow-sm border-0 overflow-hidden">
         <div class="card-body p-4 p-md-5">
-          <h1 class="h3 mb-2">Thanks for downloading OATTS {version ? ` ${version}` : ""} for {osLabel}!</h1>
+          <h1 class="h3 mb-2">Thanks for downloading OATTS for {osLabel}!</h1>
           <p class="text-body-secondary mb-3">
             Your download should start automatically. If not, you can retry below.
           </p>

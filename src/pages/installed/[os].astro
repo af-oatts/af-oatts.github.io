@@ -1,0 +1,21 @@
+---
+import Downloaded from "../../components/Downloaded.astro";
+
+import DownloadRoot from "../../layouts/DownloadRoot.astro";
+
+
+export function getStaticPaths() {
+    return [
+        { params: { os: "windows" } },
+        { params: { os: "linux" } },
+        { params: { os: "macos" } },
+    ];
+}
+const { os } = Astro.params;
+---
+
+<div style="height: 101vh;" >
+    <DownloadRoot>
+        <Downloaded os={os} />
+    </DownloadRoot>
+</div>

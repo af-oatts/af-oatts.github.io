@@ -1,0 +1,27 @@
+---
+import Footer from "../components/Footer.astro";
+import Navbar from "../components/Navbar.astro";
+import Root from "./Root.astro";
+import { ClientRouter } from "astro:transitions";
+---
+
+<Root>
+    <ClientRouter slot="head" />
+    <Navbar />
+    <main >
+        <slot />
+    </main>
+    <Footer />
+</Root>
+
+<script>
+    // If the user goes "back" into a page we originally reached via soft nav,
+    // force a hard reload (disable client router for this back step)
+    window.addEventListener("popstate", (ev) => {
+        if (ev.state) {
+            // prevent loops: clear the state flag before reloading
+            history.replaceState(null, "", location.href);
+            location.reload();
+        }
+    });
+</script>
