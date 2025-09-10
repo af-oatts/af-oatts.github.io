@@ -3,175 +3,77 @@ import Navbar from "../components/Navbar.astro";
 import DotBackground from "../components/DotBackground.astro";
 import Root from "../layouts/Root.astro";
 import Footer from "../components/Footer.astro";
+import DownloadCard from "../components/DownloadCard.astro";
+import Downloaded from "../components/Downloaded.astro";
 ---
 
 <Root>
     <Navbar />
     <section style="height:100vh;">
         <DotBackground fadeInset={400}>
-            <div class="dl-card-wrap px-3">
-                <div class="dl-card p-4 p-md-5">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div>
-                            <h1 class="h4 m-0">Download OATTS</h1>
-                            <div class="text-body-secondary small"></div>
-                        </div>
-                    </div>
+            <!-- BEFORE view -->
+            <div id="before" class="transition-fade">
+                <DownloadCard />
+            </div>
 
-                    <div id="osGroup" class="d-flex flex-wrap gap-2 mb-4">
-                        <label class="btn os-pill px-3 py-2" data-os="windows">
-                            <input type="radio" name="os" value="windows" /> Windows
-                        </label>
-                        <label
-                            class="btn os-pill px-3 py-2"
-                            data-os="macos_arm"
-                        >
-                            <input type="radio" name="os" value="macos_arm" /> macOS
-                            (Apple Silicon)
-                        </label>
-                        <label
-                            class="btn os-pill px-3 py-2"
-                            data-os="macos_intel"
-                        >
-                            <input type="radio" name="os" value="macos_intel" />
-                            macOS (Intel)
-                        </label>
-                        <label
-                            class="btn os-pill px-3 py-2"
-                            data-os="linux_appimage"
-                        >
-                            <input
-                                type="radio"
-                                name="os"
-                                value="linux_appimage"
-                            /> Linux (AppImage)
-                        </label>
-                    </div>
-
-                    <div class="d-grid">
-                        <a
-                            id="downloadBtn"
-                            class="btn btn-primary btn-lg px-4 py-3 fw-bold"
-                            data-explode
-                            download
-                        >
-                            Download
-                        </a>
-                    </div>
-
-                    <div
-                        class="d-flex justify-content-between align-items-center mt-3"
-                    >
-                        <span class="text-body-secondary small"
-                            >v1.0.0 • 64-bit</span
-                        >
-                        <a
-                            id="checksumsLink"
-                            class="link-light link-underline-opacity-25 small"
-                            href="/releases"
-                        >
-                            Checksums & notes
-                        </a>
-                    </div>
+            <!-- AFTER view: pre-render all OS variants, show one on swap -->
+            <div id="after" class="d-none opacity-0 transition-fade">
+                <div data-os="windows"><Downloaded os="windows" /></div>
+                <div data-os="macos_arm"><Downloaded os="macos_arm" /></div>
+                <div data-os="macos_intel"><Downloaded os="macos_intel" /></div>
+                <div data-os="linux_appimage">
+                    <Downloaded os="linux" />
                 </div>
             </div>
 
             <style>
-                .dl-card-wrap {
-                    position: relative;
-                    display: grid;
-                    place-items: center;
+                .transition-fade {
+                    transition: opacity 1.5s ease;
                 }
-                .dl-card {
-                    position: relative;
-                    z-index: 1;
-                    width: min(560px, 92vw);
-                    border-radius: 20px;
-
-                    background: var(--bs-body-bg);
-
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
-                }
-                .dl-card-wrap::after {
-                    content: "";
-                    position: absolute;
-                    inset: -84px;
+                .is-fade-out {
+                    opacity: 0 !important;
                     pointer-events: none;
-
-                    z-index: 0;
-
-                    background: radial-gradient(
-                        140% 120% at 50% 50%,
-                        var(--bs-body-bg) 0%,
-                        color-mix(in srgb, var(--bs-body-bg) 85%, transparent)
-                            55%,
-                        transparent 85%
-                    );
-                    filter: blur(28px);
                 }
-
-                .os-pill {
-                    user-select: none;
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    color: #cfe0ff;
-                    background: rgba(94, 160, 255, 0.08);
-                }
-                .os-pill input {
-                    display: none;
-                }
-                .os-pill.active {
-                    color: #0b0f19;
-                    background: #5ea0ff;
-                    border-color: transparent;
+                .is-fade-in {
+                    opacity: 1 !important;
                 }
             </style>
 
             <script is:inline>
-                const DOWNLOADS = {
-                    windows: "/",
-                    macos_arm: "",
-                    macos_intel: "",  // TODO: Once releases are ready replace these.
-                    linux_appimage: "",
-                };
+                const before = document.getElementById("before");
+                const after = document.getElementById("after");
 
-                function detectOS() {
-                    const ua = navigator.userAgent || "";
-                    const plat = navigator.platform || "";
+                const sectionEl =
+                    document.currentScript.closest("section") ||
+                    document.querySelector("section");
+                if (sectionEl) sectionEl.classList.add("transition-fade");
 
-                    if (/Windows/i.test(ua) || /Win/i.test(plat))
-                        return "windows";
+                (sectionEl || document).addEventListener("downloaded", (e) => {
+                    const os = e.detail?.os || "windows";
 
-                    if (/Mac/i.test(ua) || /Mac/i.test(plat)) {
-                        const isArmHint = /Apple|ARM|aarch64|arm64/i.test(ua);
-                        return isArmHint ? "macos_arm" : "macos_arm";
-                    }
+                    if (sectionEl) sectionEl.classList.add("is-fade-out");
 
-                    if (/Linux|X11/i.test(ua)) return "linux";
+                    setTimeout(() => {
+                        if (before) before.remove();
 
-                    return "windows";
-                }
+                        after.querySelectorAll("[data-os]").forEach((node) => {
+                            node.style.display =
+                                node.getAttribute("data-os") === os
+                                    ? "block"
+                                    : "none";
+                        });
+                        after.classList.remove("d-none");
 
-                const osGroup = document.getElementById("osGroup");
-                const downloadBtn = document.getElementById("downloadBtn");
+                        void after.offsetWidth;
+                        after.classList.add("is-fade-in");
 
-                function setActive(osKey) {
-                    osGroup.querySelectorAll(".os-pill").forEach((lbl) => {
-                        const active = lbl.getAttribute("data-os") === osKey;
-                        lbl.classList.toggle("active", active);
-                        const input = lbl.querySelector("input");
-                        if (input) input.checked = active;
-                    });
-                    //TODO: downloadBtn.href = DOWNLOADS[osKey] || "#"; 
-                }
+                        if (sectionEl) {
+                            sectionEl.classList.remove("is-fade-out");
 
-                setActive(detectOS());
-
-                osGroup.addEventListener("click", (e) => {
-                    const lbl = e.target.closest(".os-pill");
-                    if (!lbl) return;
-                    const osKey = lbl.getAttribute("data-os");
-                    if (osKey) setActive(osKey);
+                            void sectionEl.offsetWidth;
+                            sectionEl.classList.add("is-fade-in");
+                        }
+                    }, 1000);
                 });
             </script>
         </DotBackground>
