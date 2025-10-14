@@ -1,4 +1,6 @@
 ---
+import { GITHUB_OWNER, GITHUB_REPO } from '../lib/constants';
+
 interface Step {
   title: string;
   img: string;
@@ -22,7 +24,7 @@ const osLabel = {
   linux_appimage: "Linux"
 }[os] ?? os;
 
-let retryUrl = '';
+let retryUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${version}/${filename}`;
 
 const linuxSteps : Step[] = [
   ]
@@ -56,7 +58,7 @@ const steps = os.includes('windows')? windowsSteps : os.includes('macos')? macos
           <p class="text-body-secondary mb-3">
             Your download should start automatically. If not, you can retry below.
           </p>
-          <a href={retryUrl} class="btn btn-outline-primary btn-sm">
+          <a href={retryUrl} download="OATTS" class="btn btn-outline-primary btn-sm">
             Retry Download
           </a>
         </div>
@@ -111,9 +113,9 @@ const steps = os.includes('windows')? windowsSteps : os.includes('macos')? macos
           </div>
 
           <div class="d-flex flex-wrap gap-2 mt-4">
-            <a href={retryUrl} class="btn btn-primary btn-sm">Download again</a>
+            <a href={retryUrl} download="OATTS" class="btn btn-primary btn-sm">Download again</a>
             <a href="/note-to-it" class="btn btn-outline-secondary btn-sm">For IT Teams</a>
-            <a href="https://github.com/af-oatts/oatts/issues/new" class="btn btn-outline-secondary btn-sm">Report Issue</a>
+            <a href=`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/issues/new` class="btn btn-outline-secondary btn-sm">Report Issue</a>
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ import DownloadCard from "../components/DownloadCard.astro";
 import Downloaded from "../components/Downloaded.astro";
 import DownloadRoot from "../layouts/DownloadRoot.astro";
 import {navigate} from 'astro:transitions/client';
+import OtherReleases from "../components/OtherReleases.astro";
 ---
 
 <DownloadRoot>
@@ -31,7 +32,6 @@ import {navigate} from 'astro:transitions/client';
             </style>
 
             <script is:inline define:vars={{navigate}}>
-                const before = document.getElementById("before");
 
                 const sectionEl =
                     document.currentScript.closest("section") ||
@@ -44,6 +44,7 @@ import {navigate} from 'astro:transitions/client';
                     if (sectionEl) sectionEl.classList.add("is-fade-out");
 
                     setTimeout(() => {
+                        document.getElementById('invisibleRedirector')?.setAttribute('href', '/installed/' + os);
                         document.getElementById('invisibleRedirector')?.click();
                     }, 1500);
                     setTimeout(() => {
@@ -53,4 +54,9 @@ import {navigate} from 'astro:transitions/client';
             </script>
         </DotBackground>
     </section>
+    <OtherReleases></OtherReleases>
+
+
+
+
 </DownloadRoot>

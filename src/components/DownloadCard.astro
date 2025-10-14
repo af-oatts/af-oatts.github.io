@@ -1,5 +1,7 @@
 ---
+
 ---
+
 <div class="dl-card-wrap px-3">
     <div class="dl-card p-4 p-md-5">
         <div class="d-flex align-items-center gap-3 mb-3">
@@ -10,8 +12,13 @@
         </div>
 
         <div id="osGroup" class="d-flex flex-wrap gap-2 mb-4">
-            <label class="btn os-pill px-3 py-2" data-os="windows">
-                <input type="radio" name="os" value="windows" /> Windows
+            <label class="btn os-pill px-3 py-2" data-os="windows_exe">
+                <input type="radio" name="os" value="windows_exe" /> Windows Installer
+                (EXE)
+            </label>
+            <label class="btn os-pill px-3 py-2" data-os="windows_msi">
+                <input type="radio" name="os" value="windows_msi" /> Windows Installer
+                (MSI)
             </label>
             <label class="btn os-pill px-3 py-2" data-os="macos_arm">
                 <input type="radio" name="os" value="macos_arm" /> macOS (Apple Silicon)
@@ -100,54 +107,54 @@
 </style>
 
 <script is:inline>
-     const DOWNLOADS = {
-    windows: "/",
-    macos_arm: "",
-    macos_intel: "",  // TODO
-    linux_appimage: "",
-  };
+    const DOWNLOADS = {
+        windows: "/",
+        macos_arm: "",
+        macos_intel: "", // TODO
+        linux_appimage: "",
+    };
 
-  function detectOS() {
-    const ua = navigator.userAgent || "";
-    const plat = navigator.platform || "";
-    if (/Windows/i.test(ua) || /Win/i.test(plat)) return "windows";
-    if (/Mac/i.test(ua) || /Mac/i.test(plat)) {
-      const isArmHint = /Apple|ARM|aarch64|arm64/i.test(ua);
-      return isArmHint ? "macos_arm" : "macos_arm";
+    function detectOS() {
+        const ua = navigator.userAgent || "";
+        const plat = navigator.platform || "";
+        if (/Windows/i.test(ua) || /Win/i.test(plat)) return "windows_exe";
+        if (/Mac/i.test(ua) || /Mac/i.test(plat)) {
+            const isArmHint = /Apple|ARM|aarch64|arm64/i.test(ua);
+            return isArmHint ? "macos_arm" : "macos_arm";
+        }
+        if (/Linux|X11/i.test(ua)) return "linux_appimage";
+        return "windows_exe";
     }
-    if (/Linux|X11/i.test(ua)) return "linux_appimage";
-    return "windows";
-  }
 
-  const osGroup = document.getElementById("osGroup");
-  const downloadBtn = document.getElementById("downloadBtn");
-  let selectedOS = detectOS();
+    const osGroup = document.getElementById("osGroup");
+    const downloadBtn = document.getElementById("downloadBtn");
+    let selectedOS = detectOS();
 
-  function setActive(osKey) {
-    selectedOS = osKey;
-    osGroup.querySelectorAll(".os-pill").forEach((lbl) => {
-      const active = lbl.getAttribute("data-os") === osKey;
-      lbl.classList.toggle("active", active);
-      const input = lbl.querySelector("input");
-      if (input) input.checked = active;
+    function setActive(osKey) {
+        selectedOS = osKey;
+        osGroup.querySelectorAll(".os-pill").forEach((lbl) => {
+            const active = lbl.getAttribute("data-os") === osKey;
+            lbl.classList.toggle("active", active);
+            const input = lbl.querySelector("input");
+            if (input) input.checked = active;
+        });
+        // TODO: downloadBtn.href = DOWNLOADS[osKey] || "#";
+    }
+
+    setActive(selectedOS);
+
+    osGroup.addEventListener("click", (e) => {
+        const lbl = e.target.closest(".os-pill");
+        if (!lbl) return;
+        const osKey = lbl.getAttribute("data-os");
+        if (osKey) setActive(osKey);
     });
-    // TODO: downloadBtn.href = DOWNLOADS[osKey] || "#";
-  }
 
-  setActive(selectedOS);
-
-  osGroup.addEventListener("click", (e) => {
-    const lbl = e.target.closest(".os-pill");
-    if (!lbl) return;
-    const osKey = lbl.getAttribute("data-os");
-    if (osKey) setActive(osKey);
-  });
-
-  downloadBtn.addEventListener("click", () => {
-    const ev = new CustomEvent("downloaded", {
-      detail: { os: selectedOS },
-      bubbles: true,
+    downloadBtn.addEventListener("click", () => {
+        const ev = new CustomEvent("downloaded", {
+            detail: { os: selectedOS },
+            bubbles: true,
+        });
+        downloadBtn.dispatchEvent(ev);
     });
-    downloadBtn.dispatchEvent(ev);
-  });
 </script>
