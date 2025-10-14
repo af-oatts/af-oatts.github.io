@@ -8,21 +8,43 @@ interface Step {
 
 type Props = {
     os: string
+    version: string,
+    filename: string,
 }
 
-const {os} = Astro.props;
+const {os, version, filename} = Astro.props;
 
 const osLabel = {
-  windows: "Windows",
-  macos_arm: "macOS (Apple Silicon)",
-  macos_intel: "macOS (Intel)",
-  linux: "Linux"
+  windows_exe: "Windows",
+  windows_msi: "Windows",
+  macos_arm_gz: "MacOS (Apple Silicon)",
+  macos_intel: "MacOS (Intel)",
+  linux_appimage: "Linux"
 }[os] ?? os;
+
 let retryUrl = '';
 
+const linuxSteps : Step[] = [
+  ]
+  const macosSteps : Step[] = [
+  {title: 'Click on the file just downloaded.', alt: 'OATTS MacOS installer in downloads', img: `/instructions/macos/downloaded_installer.png`, body: 'You can also go to Finder > Downloads'},
+  {title: 'Find OATTS Installer.app', alt: 'OATTS installer app unzipped', img: `/instructions/macos/installer_in_folder.png`, body: 'After clicking the .zip file that was downloaded in the prior step, OATTS Installer.app should show up just beside it in Finder.'},
+  {title: 'Command+Click OATTS Installer.app', alt: 'OATTS installer with right click menu.', img: `/instructions/macos/installer_right_click.png`, body: 'Holding down the Command key, click on OATTS Installer.app. Or right click if you have customized macOS. Double clicking on the app WILL NOT WORK!'},
+  {title: 'Click Open, and click Open again', alt: 'macOS babygate', img: `/instructions/macos/babygate.png`, body: 'From the prior popup, click open. You will get a popup saying macOS cannot verify the developer. This is OK. OATTS is still safe to install. Click Open again.'},
+  {title: 'Follow installation instructions in installer', alt: 'OATTS installer.', img: `/instructions/macos/installer_welcome.png`, body: 'The installer will guide you through installing OATTS. Please note that if you install for All Users, you will need to log in as an admin. You don\'t need admin if you\'re only installing for yourself.'},
+  {title: 'Done!', alt: 'OATTS in launchpad', img: `/instructions/macos/app_in_launchpad.png`, body: 'OATTS is now installed! You can find it in Launchpad or in search. Happy learning!'},
+
+]
+const windowsSteps : Step[] = [
+  {title: 'Click on the file just downloaded.', alt: 'OATTS Windows installer in downloads', img: `/instructions/windows/downloaded_installer_${os.includes('msi')? 'msi' : 'exe'}.png`, body: 'If you\'re on Microsoft Edge, choose Open.'},
+  {title: '(Optional) Click More info in Windows Defender', alt: 'Windows Defender claiming to have protected your computer.', img: '/instructions/windows/defender_protected.png', body: 'You may get a popup saying Windows Defender doesn\'t recognize this app. It\'s ok, OATTS is safe. Click More info.'},
+  {title: '(Optional) Click Run Anyways in Windows Defender', alt: 'Run anyway button', img: '/instructions/windows/defender_run_anyways.png', body: 'If you had the popup in the prior step, and clicked More info, there should now be a Run Anyway button in the bottom right corner.'},
+  {title: 'Follow the instructions in the installer', alt: 'The OATTS installer', img: `/instructions/windows/setup_${os.includes('msi')? 'msi' : 'exe'}.png`, body: 'The installer will guide you through installing OATTS. '},
+  {title: 'Done!', alt: 'OATTS in the windows search bar', img: `/instructions/windows/installed.png`, body: 'You can find OATTS in the Windows search bar. Happy learning!'},
+]
 
 
-const steps: Step[] = [];
+const steps = os.includes('windows')? windowsSteps : os.includes('macos')? macosSteps : linuxSteps
 ---
 
 <section class="container my-5">
@@ -30,7 +52,7 @@ const steps: Step[] = [];
     <div class="col-12 col-lg-10 col-xxl-9">
       <div class="card shadow-sm border-0 overflow-hidden">
         <div class="card-body p-4 p-md-5">
-          <h1 class="h3 mb-2">Thanks for downloading OATTS for {osLabel}!</h1>
+          <h1 class="h3 mb-2">Thanks for downloading OATTS {version} for {osLabel}!</h1>
           <p class="text-body-secondary mb-3">
             Your download should start automatically. If not, you can retry below.
           </p>

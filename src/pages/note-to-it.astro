@@ -1,3 +1,53 @@
 ---
+import Footer from "../components/Footer.astro";
+import Navbar from "../components/Navbar.astro";
+import Root from "../layouts/Root.astro";
 ---
-Hi IT teams!
+
+
+<Root>
+    <body>
+        <Navbar></Navbar>
+        <div class="container py-5">
+            <h2>Dear IT Teams,</h2>
+
+            <div>
+                <p>
+                    <b>OATTS</b> provides a custom installer for macOS. This installer may trigger antivirus alerts, or be restricted by SIP or MDM policies. 
+                </p>
+                <p>
+                    The installer is not distributed as a standard <code>.dmg</code> file. To distribute signed <code>.dmg</code>s without requiring end users to execute commands, Apple requires a $100/year developer program subscription. <b>OATTS currently operates without a recurring budget</b>, so this option is not feasible. If future funding allows, proper code signing will be among our top priorities.
+                </p>
+
+                <h4>What does the installer do?</h4>
+                <ol>
+                    <li>
+                        <h6>Extracts the bundled application</h6>
+                        The installer contains a zipped <code>.app</code> directory. It first extracts this content to a temporary location.
+                    </li>
+                    <li>
+                        <h6>Copies the application to the Applications folder</h6>
+                        The extracted application is copied to the user's <code>~/Applications</code> folder. If installation for all users is selected, the copy uses <code>ditto</code> with administrator privileges, placing it in <code>/Applications</code>.
+                    </li>
+                    <li>
+                        <h6>Removes the quarantine attribute</h6>
+                        Finally, the installer runs <code>xattr -dr com.apple.quarantine</code> on the application. This bypasses Apple's Gatekeeper since the app is not signed with an Apple-issued certificate.  
+                        While necessary for functionality, this step may resemble malware-like behavior and be flagged by antivirus software or blocked by SIP/MDM. To ensure successful deployment, please allowlist <b>OATTS</b> in relevant security policies.  
+                        
+                </ol>
+
+                The installer is self-signed. Verification should be based on signature validation and checksum comparison against GitHub rather than app name alone. For complete transparency, the installer's source code is publicly available for review.
+                <br>
+                <br>
+                Thank you for keeping your people safe from cyberthreats!
+                <br>
+                
+                <b>
+                    - The OATTS Authors
+                </b>
+            </div>
+
+        </div>
+        <Footer></Footer>
+    </body>
+</Root>
