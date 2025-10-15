@@ -8,3 +8,11 @@ export const BUILD_TARGETS = {
   WINDOWS_EXE: "windows_exe",
   WINDOWS_MSI: "windows_msi",
 };
+
+export const FILE_REGEX = {
+  MAC_OS_ARM: /arm\.app\.tar\.gz/,
+  MAC_OS_INTEL: /intel\.app\.tar\.gz/,
+  LINUX: /linux\.AppImage/,
+  WINDOWS_EXE: /windows\.exe/,
+  WINDOWS_MSI: /windows\.msi/,
+};
