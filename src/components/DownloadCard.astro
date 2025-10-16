@@ -7,8 +7,7 @@ import {
 } from "../lib/constants";
 import type { Endpoints } from "@octokit/types";
 
-const LATEST_URL =
-  "https://api.github.com/repos/af-oatts/boatts/releases/latest";
+const LATEST_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`;
 
 type Release =
   Endpoints["GET /repos/{owner}/{repo}/releases/latest"]["response"]["data"];
