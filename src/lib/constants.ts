@@ -16,3 +16,11 @@ export const FILE_REGEX = {
   WINDOWS_EXE: /windows\.exe/,
   WINDOWS_MSI: /windows\.msi/,
 };
+
+export const OS_LABELS = {
+  WINDOWS_EXE: "Windows",
+  WINDOWS_MSI: "Windows",
+  MAC_OS_ARM: "MacOS (Apple Silicon)",
+  MAC_OS_INTEL: "MacOS (Intel)",
+  LINUX: "Linux"
+}
