@@ -1,59 +1,8 @@
 ---
-import {
-  BUILD_TARGETS,
-  FILE_REGEX,
-  GITHUB_OWNER,
-  GITHUB_REPO,
-} from "../lib/constants";
-import type { Endpoints } from "@octokit/types";
+import { BUILD_TARGETS } from "../lib/constants";
+import { getDownloads, getLatestRelease } from "../services/getDownloads";
 
-const LATEST_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`;
-
-type Release =
-  Endpoints["GET /repos/{owner}/{repo}/releases/latest"]["response"]["data"];
-
-const release: Release = await fetch(LATEST_URL)
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response.json(); // Parse the response body as JSON
-  })
-  .catch((error) => console.error(error));
-
-function findRelease(release: Release, target: RegExp) {
-  return release?.assets.find((x) => x.name.match(target))?.name || "";
-}
-
-function getDownload(release: Release, target: keyof typeof BUILD_TARGETS) {
-  let filename: string = "";
-  switch (target) {
-    case BUILD_TARGETS.MAC_OS_ARM:
-      filename = findRelease(release, FILE_REGEX.MAC_OS_ARM);
-    case BUILD_TARGETS.MAC_OS_INTEL:
-      filename = findRelease(release, FILE_REGEX.MAC_OS_INTEL);
-    case BUILD_TARGETS.LINUX:
-      filename = findRelease(release, FILE_REGEX.LINUX);
-    case BUILD_TARGETS.WINDOWS_MSI:
-      filename = findRelease(release, FILE_REGEX.WINDOWS_MSI);
-    case BUILD_TARGETS.WINDOWS_EXE:
-      filename = findRelease(release, FILE_REGEX.WINDOWS_EXE);
-    default:
-  }
-  if (!filename) {
-    console.error("Couldn't find target release");
-    return "";
-  }
-  return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${release.tag_name}/${filename}`;
-}
-
-const downloads = Object.values(BUILD_TARGETS).reduce(
-  (acc, key: string) => {
-    acc[key] = getDownload(release, key as keyof typeof BUILD_TARGETS);
-    return acc;
-  },
-  {} as Record<string, string>
-);
+const downloads = getLatestRelease().then((release) => getDownloads(release));
 ---
 
 <div class="dl-card-wrap px-3">
