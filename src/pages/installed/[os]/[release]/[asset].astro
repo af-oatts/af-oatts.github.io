@@ -1,0 +1,47 @@
+---
+import Downloaded from "../../../../components/Downloaded.astro";
+import DownloadRoot from "../../../../layouts/DownloadRoot.astro";
+import type { Endpoints } from "@octokit/types"
+import { GITHUB_OWNER, GITHUB_REPO,BUILD_TARGETS } from "../../../../lib/constants";
+
+type Release = Endpoints["GET /repos/{owner}/{repo}/releases"]["response"]["data"]
+
+export async function getStaticPaths() {
+    const data: Release = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases`).then((response) => {
+        if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json(); // Parse the response body as JSON
+    }).catch(error => console.error(error))
+
+    return data.flatMap((release) => release.assets.map((asset) => {
+        const os = asset.name.match(/aarch64/) ? BUILD_TARGETS.MAC_OS_ARM :
+            asset.name.match(/x64\.dmg|x64\.app\.tar\.gz/) ? BUILD_TARGETS.MAC_OS_INTEL : BUILD_TARGETS.WINDOWS_EXE
+        return {params: {os, release: release.tag_name, asset: asset.name}}
+    }))
+}
+
+const { os, release, asset } = Astro.params
+
+// Return 400 if version or filename are missing
+if (!os || !release || !asset) {
+    return new Response(null, {
+        status: 400,
+        statusText: 'Bad Request: Missing os, version or filename'
+    });
+}
+---
+
+
+<div style="height: 101vh;">
+    <div style="display: none;">
+        <a id="downloaderAnchor" href={`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${release}/${asset}`} download="OATTS"/>
+    </div>
+    <DownloadRoot>
+        <Downloaded os={os} version={release||""} filename={asset} />
+    </DownloadRoot>
+</div>
+<script>
+    const downloader = document.getElementById('downloaderAnchor');
+    downloader?.click()
+</script>
