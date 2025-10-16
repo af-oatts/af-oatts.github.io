@@ -22,7 +22,7 @@ const release: Release = await fetch(LATEST_URL)
   .catch((error) => console.error(error));
 
 function findRelease(release: Release, target: RegExp) {
-  return release.assets.find((x) => x.name.match(target))?.name || "";
+  return release?.assets.find((x) => x.name.match(target))?.name || "";
 }
 
 function getDownload(release: Release, target: keyof typeof BUILD_TARGETS) {
