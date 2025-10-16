@@ -1,5 +1,5 @@
 ---
-import { GITHUB_OWNER, GITHUB_REPO } from '../lib/constants';
+import { BUILD_TARGETS, GITHUB_OWNER, GITHUB_REPO } from '../lib/constants';
 
 interface Step {
   title: string;
@@ -17,11 +17,11 @@ type Props = {
 const {os, version, filename} = Astro.props;
 
 const osLabel = {
-  windows_exe: "Windows",
-  windows_msi: "Windows",
-  macos_arm_gz: "MacOS (Apple Silicon)",
-  macos_intel: "MacOS (Intel)",
-  linux_appimage: "Linux"
+  [BUILD_TARGETS.WINDOWS_EXE]: "Windows",
+  [BUILD_TARGETS.WINDOWS_MSI]: "Windows",
+  [BUILD_TARGETS.MAC_OS_ARM]: "MacOS (Apple Silicon)",
+  [BUILD_TARGETS.MAC_OS_INTEL]: "MacOS (Intel)",
+  [BUILD_TARGETS.LINUX]: "Linux"
 }[os] ?? os;
 
 let retryUrl = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${version}/${filename}`;
