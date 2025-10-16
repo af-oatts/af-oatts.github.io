@@ -1,160 +1,209 @@
 ---
+import {
+  BUILD_TARGETS,
+  FILE_REGEX,
+  GITHUB_OWNER,
+  GITHUB_REPO,
+} from "../lib/constants";
+import type { Endpoints } from "@octokit/types";
 
+const LATEST_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`;
+
+type Release =
+  Endpoints["GET /repos/{owner}/{repo}/releases/latest"]["response"]["data"];
+
+const release: Release = await fetch(LATEST_URL)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json(); // Parse the response body as JSON
+  })
+  .catch((error) => console.error(error));
+
+function findRelease(release: Release, target: RegExp) {
+  return release?.assets.find((x) => x.name.match(target))?.name || "";
+}
+
+function getDownload(release: Release, target: keyof typeof BUILD_TARGETS) {
+  let filename: string = "";
+  switch (target) {
+    case BUILD_TARGETS.MAC_OS_ARM:
+      filename = findRelease(release, FILE_REGEX.MAC_OS_ARM);
+    case BUILD_TARGETS.MAC_OS_INTEL:
+      filename = findRelease(release, FILE_REGEX.MAC_OS_INTEL);
+    case BUILD_TARGETS.LINUX:
+      filename = findRelease(release, FILE_REGEX.LINUX);
+    case BUILD_TARGETS.WINDOWS_MSI:
+      filename = findRelease(release, FILE_REGEX.WINDOWS_MSI);
+    case BUILD_TARGETS.WINDOWS_EXE:
+      filename = findRelease(release, FILE_REGEX.WINDOWS_EXE);
+    default:
+  }
+  if (!filename) {
+    console.error("Couldn't find target release");
+    return "";
+  }
+  return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${release.tag_name}/${filename}`;
+}
+
+const downloads = Object.values(BUILD_TARGETS).reduce(
+  (acc, key: string) => {
+    acc[key] = getDownload(release, key as keyof typeof BUILD_TARGETS);
+    return acc;
+  },
+  {} as Record<string, string>
+);
 ---
 
 <div class="dl-card-wrap px-3">
-    <div class="dl-card p-4 p-md-5">
-        <div class="d-flex align-items-center gap-3 mb-3">
-            <div>
-                <h1 class="h4 m-0">Download OATTS</h1>
-                <div class="text-body-secondary small"></div>
-            </div>
-        </div>
-
-        <div id="osGroup" class="d-flex flex-wrap gap-2 mb-4">
-            <label class="btn os-pill px-3 py-2" data-os="windows_exe">
-                <input type="radio" name="os" value="windows_exe" /> Windows Installer
-                (EXE)
-            </label>
-            <label class="btn os-pill px-3 py-2" data-os="windows_msi">
-                <input type="radio" name="os" value="windows_msi" /> Windows Installer
-                (MSI)
-            </label>
-            <label class="btn os-pill px-3 py-2" data-os="macos_arm">
-                <input type="radio" name="os" value="macos_arm" /> macOS (Apple Silicon)
-            </label>
-            <label class="btn os-pill px-3 py-2" data-os="macos_intel">
-                <input type="radio" name="os" value="macos_intel" />
-                macOS (Intel)
-            </label>
-            <label class="btn os-pill px-3 py-2" data-os="linux_appimage">
-                <input type="radio" name="os" value="linux_appimage" /> Linux (AppImage)
-            </label>
-        </div>
-
-        <div class="d-grid">
-            <a
-                id="downloadBtn"
-                class="btn btn-primary btn-lg px-4 py-3 fw-bold"
-                data-explode
-                download
-            >
-                Download
-            </a>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="text-body-secondary small">v1.0.0 • 64-bit</span>
-            <a
-                id="checksumsLink"
-                class="link-light link-underline-opacity-25 small"
-                href="/releases"
-            >
-                Checksums & notes
-            </a>
-        </div>
+  <div class="dl-card p-4 p-md-5">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <div>
+        <h1 class="h4 m-0">Download OATTS</h1>
+        <div class="text-body-secondary small"></div>
+      </div>
     </div>
+
+    <div id="osGroup" class="d-flex flex-wrap gap-2 mb-4">
+      <label class="btn os-pill px-3 py-2" data-os={BUILD_TARGETS.WINDOWS_EXE}>
+        <input type="radio" name="os" value={BUILD_TARGETS.WINDOWS_EXE} /> Windows
+        Installer (EXE)
+      </label>
+      <label class="btn os-pill px-3 py-2" data-os={BUILD_TARGETS.WINDOWS_MSI}>
+        <input type="radio" name="os" value={BUILD_TARGETS.WINDOWS_MSI} /> Windows
+        Installer (MSI)
+      </label>
+      <label class="btn os-pill px-3 py-2" data-os={BUILD_TARGETS.MAC_OS_ARM}>
+        <input type="radio" name="os" value={BUILD_TARGETS.MAC_OS_ARM} /> macOS (Apple
+        Silicon)
+      </label>
+      <label class="btn os-pill px-3 py-2" data-os={BUILD_TARGETS.MAC_OS_INTEL}>
+        <input type="radio" name="os" value={BUILD_TARGETS.MAC_OS_INTEL} />
+        macOS (Intel)
+      </label>
+      <label class="btn os-pill px-3 py-2" data-os={BUILD_TARGETS.LINUX}>
+        <input type="radio" name="os" value={BUILD_TARGETS.LINUX} /> Linux (AppImage)
+      </label>
+    </div>
+
+    <div class="d-grid">
+      <a
+        id="downloadBtn"
+        class="btn btn-primary btn-lg px-4 py-3 fw-bold"
+        data-explode
+        download
+      >
+        Download
+      </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <span class="text-body-secondary small">v1.0.0 • 64-bit</span>
+      <a
+        id="checksumsLink"
+        class="link-light link-underline-opacity-25 small"
+        href="/releases"
+      >
+        Checksums & notes
+      </a>
+    </div>
+  </div>
 </div>
 
 <style>
-    .dl-card-wrap {
-        position: relative;
-        display: grid;
-        place-items: center;
-    }
-    .dl-card {
-        position: relative;
-        z-index: 1;
-        width: min(560px, 92vw);
-        border-radius: 20px;
+  .dl-card-wrap {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+  .dl-card {
+    position: relative;
+    z-index: 1;
+    width: min(560px, 92vw);
+    border-radius: 20px;
 
-        background: var(--bs-body-bg);
+    background: var(--bs-body-bg);
 
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
-    }
-    .dl-card-wrap::after {
-        content: "";
-        position: absolute;
-        inset: -84px;
-        pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  }
+  .dl-card-wrap::after {
+    content: "";
+    position: absolute;
+    inset: -84px;
+    pointer-events: none;
 
-        z-index: 0;
+    z-index: 0;
 
-        background: radial-gradient(
-            140% 120% at 50% 50%,
-            var(--bs-body-bg) 0%,
-            color-mix(in srgb, var(--bs-body-bg) 85%, transparent) 55%,
-            transparent 85%
-        );
-        filter: blur(28px);
-    }
+    background: radial-gradient(
+      140% 120% at 50% 50%,
+      var(--bs-body-bg) 0%,
+      color-mix(in srgb, var(--bs-body-bg) 85%, transparent) 55%,
+      transparent 85%
+    );
+    filter: blur(28px);
+  }
 
-    .os-pill {
-        user-select: none;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: #cfe0ff;
-        background: rgba(94, 160, 255, 0.08);
-    }
-    .os-pill input {
-        display: none;
-    }
-    .os-pill.active {
-        color: #0b0f19;
-        background: #5ea0ff;
-        border-color: transparent;
-    }
+  .os-pill {
+    user-select: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cfe0ff;
+    background: rgba(94, 160, 255, 0.08);
+  }
+  .os-pill input {
+    display: none;
+  }
+  .os-pill.active {
+    color: #0b0f19;
+    background: #5ea0ff;
+    border-color: transparent;
+  }
 </style>
 
-<script is:inline>
-    const DOWNLOADS = {
-        windows: "/",
-        macos_arm: "",
-        macos_intel: "", // TODO
-        linux_appimage: "",
-    };
-
-    function detectOS() {
-        const ua = navigator.userAgent || "";
-        const plat = navigator.platform || "";
-        if (/Windows/i.test(ua) || /Win/i.test(plat)) return "windows_exe";
-        if (/Mac/i.test(ua) || /Mac/i.test(plat)) {
-            const isArmHint = /Apple|ARM|aarch64|arm64/i.test(ua);
-            return isArmHint ? "macos_arm" : "macos_arm";
-        }
-        if (/Linux|X11/i.test(ua)) return "linux_appimage";
-        return "windows_exe";
+<script is:inline define:vars={{ BUILD_TARGETS, downloads }}>
+  function detectOS() {
+    const ua = navigator.userAgent || "";
+    const plat = navigator.platform || "";
+    if (/Windows/i.test(ua) || /Win/i.test(plat))
+      return BUILD_TARGETS.WINDOWS_EXE;
+    if (/Mac/i.test(ua) || /Mac/i.test(plat)) {
+      const isArmHint = /Apple|ARM|aarch64|arm64/i.test(ua);
+      return isArmHint ? BUILD_TARGETS.MAC_OS_ARM : BUILD_TARGETS.MAC_OS_INTEL;
     }
+    if (/Linux|X11/i.test(ua)) return BUILD_TARGETS.LINUX;
+    return BUILD_TARGETS.WINDOWS_EXE;
+  }
 
-    const osGroup = document.getElementById("osGroup");
-    const downloadBtn = document.getElementById("downloadBtn");
-    let selectedOS = detectOS();
+  const osGroup = document.getElementById("osGroup");
+  const downloadBtn = document.getElementById("downloadBtn");
+  let selectedOS = detectOS();
 
-    function setActive(osKey) {
-        selectedOS = osKey;
-        osGroup.querySelectorAll(".os-pill").forEach((lbl) => {
-            const active = lbl.getAttribute("data-os") === osKey;
-            lbl.classList.toggle("active", active);
-            const input = lbl.querySelector("input");
-            if (input) input.checked = active;
-        });
-        // TODO: downloadBtn.href = DOWNLOADS[osKey] || "#";
-    }
-
-    setActive(selectedOS);
-
-    osGroup.addEventListener("click", (e) => {
-        const lbl = e.target.closest(".os-pill");
-        if (!lbl) return;
-        const osKey = lbl.getAttribute("data-os");
-        if (osKey) setActive(osKey);
+  function setActive(osKey) {
+    selectedOS = osKey;
+    osGroup.querySelectorAll(".os-pill").forEach((lbl) => {
+      const active = lbl.getAttribute("data-os") === osKey;
+      lbl.classList.toggle("active", active);
+      const input = lbl.querySelector("input");
+      if (input) input.checked = active;
     });
+    downloadBtn.href = downloads[osKey] || "#";
+  }
 
-    downloadBtn.addEventListener("click", () => {
-        const ev = new CustomEvent("downloaded", {
-            detail: { os: selectedOS },
-            bubbles: true,
-        });
-        downloadBtn.dispatchEvent(ev);
+  setActive(selectedOS);
+
+  osGroup.addEventListener("click", (e) => {
+    const lbl = e.target.closest(".os-pill");
+    if (!lbl) return;
+    const osKey = lbl.getAttribute("data-os");
+    if (osKey) setActive(osKey);
+  });
+
+  downloadBtn.addEventListener("click", () => {
+    const ev = new CustomEvent("downloaded", {
+      detail: { os: selectedOS },
+      bubbles: true,
     });
+    downloadBtn.dispatchEvent(ev);
+  });
 </script>
