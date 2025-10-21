@@ -4,6 +4,7 @@ import {
   GITHUB_REPO,
   BUILD_TARGETS,
   FILE_REGEX,
+  OS_LABELS,
 } from "./constants";
 
 describe("constants", () => {
@@ -126,12 +127,72 @@ describe("constants", () => {
     });
   });
 
+  describe("OS_LABELS", () => {
+    it("should contain labels for all build targets", () => {
+      expect(OS_LABELS).toHaveProperty("WINDOWS_EXE");
+      expect(OS_LABELS).toHaveProperty("WINDOWS_MSI");
+      expect(OS_LABELS).toHaveProperty("MAC_OS_ARM");
+      expect(OS_LABELS).toHaveProperty("MAC_OS_INTEL");
+      expect(OS_LABELS).toHaveProperty("LINUX");
+    });
+
+    it("should have correct OS labels", () => {
+      expect(OS_LABELS).toEqual({
+        WINDOWS_EXE: "Windows",
+        WINDOWS_MSI: "Windows",
+        MAC_OS_ARM: "MacOS (Apple Silicon)",
+        MAC_OS_INTEL: "MacOS (Intel)",
+        LINUX: "Linux",
+      });
+    });
+
+    it("should have all string values", () => {
+      Object.values(OS_LABELS).forEach((label) => {
+        expect(typeof label).toBe("string");
+        expect(label.length).toBeGreaterThan(0);
+      });
+    });
+
+    it("should have descriptive labels for macOS variants", () => {
+      expect(OS_LABELS.MAC_OS_ARM).toContain("Apple Silicon");
+      expect(OS_LABELS.MAC_OS_INTEL).toContain("Intel");
+      expect(OS_LABELS.MAC_OS_ARM).toContain("MacOS");
+      expect(OS_LABELS.MAC_OS_INTEL).toContain("MacOS");
+    });
+
+    it("should have same label for both Windows variants", () => {
+      expect(OS_LABELS.WINDOWS_EXE).toBe(OS_LABELS.WINDOWS_MSI);
+      expect(OS_LABELS.WINDOWS_EXE).toBe("Windows");
+    });
+
+    it("should have simple label for Linux", () => {
+      expect(OS_LABELS.LINUX).toBe("Linux");
+    });
+  });
+
   describe("constants consistency", () => {
     it("should have matching keys between BUILD_TARGETS and FILE_REGEX", () => {
       const buildTargetKeys = Object.keys(BUILD_TARGETS);
       const fileRegexKeys = Object.keys(FILE_REGEX);
 
       expect(buildTargetKeys.sort()).toEqual(fileRegexKeys.sort());
+    });
+
+    it("should have matching keys between BUILD_TARGETS and OS_LABELS", () => {
+      const buildTargetKeys = Object.keys(BUILD_TARGETS);
+      const osLabelKeys = Object.keys(OS_LABELS);
+
+      expect(buildTargetKeys.sort()).toEqual(osLabelKeys.sort());
+    });
+
+    it("should have matching keys across all constant objects", () => {
+      const buildTargetKeys = Object.keys(BUILD_TARGETS);
+      const fileRegexKeys = Object.keys(FILE_REGEX);
+      const osLabelKeys = Object.keys(OS_LABELS);
+
+      expect(buildTargetKeys.sort()).toEqual(fileRegexKeys.sort());
+      expect(buildTargetKeys.sort()).toEqual(osLabelKeys.sort());
+      expect(fileRegexKeys.sort()).toEqual(osLabelKeys.sort());
     });
   });
 });
