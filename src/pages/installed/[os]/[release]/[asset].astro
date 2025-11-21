@@ -2,14 +2,17 @@
 import Downloaded from "../../../../components/Downloaded.astro";
 import DownloadRoot from "../../../../layouts/DownloadRoot.astro";
 import type { Endpoints } from "@octokit/types"
-import { GITHUB_OWNER, GITHUB_REPO,BUILD_TARGETS } from "../../../../lib/constants";
+import { GITHUB_OWNER, GITHUB_REPO,BUILD_TARGETS, IS_DEBUG } from "../../../../lib/constants";
 
 type Release = Endpoints["GET /repos/{owner}/{repo}/releases"]["response"]["data"]
 
 export async function getStaticPaths() {
     const data: Release = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases`).then((response) => {
         if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+            if(IS_DEBUG) {
+                return [];
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json(); // Parse the response body as JSON
     }).catch(error => console.error(error))
