@@ -1,0 +1,101 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Footer from "../../components/Footer.astro";
+import Navbar from "../../components/Navbar.astro";
+import Root from "../../layouts/Root.astro";
+
+export async function getStaticPaths() {
+    const legalDocs = await getCollection("legal");
+
+    return legalDocs.map((doc: CollectionEntry<"legal">) => ({
+        params: { document: doc.slug },
+        props: { doc },
+    }));
+}
+
+const { document } = Astro.params;
+const entry = await getEntry("legal", document);
+
+if (!entry) {
+    return Astro.redirect("/404");
+}
+
+const { Content } = await entry.render();
+---
+
+<Root>
+    <body>
+        <Navbar />
+        <main class="legal-content">
+            <article class="container">
+                <h1>{entry.data.title}</h1>
+                {entry.data.lastUpdated && (
+                    <p class="last-updated">
+                        Last updated: {entry.data.lastUpdated.toLocaleDateString()}
+                    </p>
+                )}
+                <Content />
+            </article>
+        </main>
+        <Footer />
+    </body>
+</Root>
+
+<style>
+    .legal-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .container {
+        line-height: 1.6;
+    }
+
+    .container h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .last-updated {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    .container :global(h2) {
+        font-size: 1.8rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .container :global(h3) {
+        font-size: 1.4rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .container :global(p) {
+        margin-bottom: 1rem;
+    }
+
+    .container :global(ul),
+    .container :global(ol) {
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+    }
+
+    .container :global(li) {
+        margin-bottom: 0.5rem;
+    }
+
+    .container :global(a) {
+        color: #0066cc;
+        text-decoration: none;
+    }
+
+    .container :global(a:hover) {
+        text-decoration: underline;
+    }
+</style>
