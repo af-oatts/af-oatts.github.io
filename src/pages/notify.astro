@@ -1,0 +1,47 @@
+---
+import Footer from "../components/Footer.astro";
+import Navbar from "../components/Navbar.astro";
+import Root from "../layouts/Root.astro";
+const FORM_URL =
+    "https://forms.osi.apps.mil/pages/responsepage.aspx?id=jbExg4ct70ijX6yIGOv5tAsmmjFx0spEqJN7JSW2ggRUN1BZRElORzVJRk84UUM3RVozM1dRM09PNy4u&embed=true";
+---
+
+<Root>
+    <body>
+        <Navbar />
+        <main class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-7">
+                    <div class="text-center mb-5">
+                        <h1 class="display-3 fw-bold mb-3">Coming Soon</h1>
+                        <p class="lead text-muted">
+                            We're waiting on some legal paperwork to go through. In the meantime, you can sign up to get notified when OATTS is about to go live.
+                        </p>
+                    </div>
+
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body">
+                            
+                            <div class="ratio" style="--bs-aspect-ratio: 110%">
+                                <iframe
+                                    src={FORM_URL}
+                                    frameborder="0"
+                                    marginwidth="0"
+                                    marginheight="0"
+                                    allowfullscreen
+                                    webkitallowfullscreen
+                                    mozallowfullscreen
+                                    msallowfullscreen
+                                    class="rounded"
+                                >
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <Footer />
+    </body>
+</Root>
+
