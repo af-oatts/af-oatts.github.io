@@ -161,14 +161,18 @@ const deb = getDebAssets(latestRelease.assets);
     );
     filter: blur(28px);
   }
-
   .os-pill {
     user-select: none;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: #1a3a6b;
+    background: rgba(94, 160, 255, 0.12);
+  }
+
+  [data-bs-theme="dark"] .os-pill {
+    border-color: rgba(255, 255, 255, 0.08);
     color: #cfe0ff;
     background: rgba(94, 160, 255, 0.08);
   }
-
   .os-pill:has(input:disabled) {
     opacity: 0.4;
     cursor: not-allowed;
