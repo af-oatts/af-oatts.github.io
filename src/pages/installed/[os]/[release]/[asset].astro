@@ -35,16 +35,8 @@ if (!os || !release || !asset) {
 }
 ---
 
-
 <div style="height: 101vh;">
-    <div style="display: none;">
-        <a id="downloaderAnchor" href={`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${release}/${asset}`} download="OATTS"/>
-    </div>
     <DownloadRoot>
         <Downloaded os={os} version={release||""} filename={asset} />
     </DownloadRoot>
 </div>
-<script>
-    const downloader = document.getElementById('downloaderAnchor');
-    downloader?.click()
-</script>

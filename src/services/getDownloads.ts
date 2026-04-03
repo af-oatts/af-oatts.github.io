@@ -12,14 +12,12 @@ export type Release =
   Endpoints["GET /repos/{owner}/{repo}/releases/latest"]["response"]["data"];
 
 export async function getLatestRelease() {
-  return fetch(LATEST_URL)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json(); // Parse the response body as JSON
-    })
-    .catch((error) => console.error(error));
+  const response = await fetch(LATEST_URL);
+  if(!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`)
+  }
+  const json = await response.json();
+  return json as Release;
 }
 
 export function findRelease(release: Release, target: RegExp) {
@@ -56,7 +54,15 @@ export function getDownload(release: Release, target: string) {
 
 export function getDownloads(release: Release) {
   return Object.values(BUILD_TARGETS).reduce((acc, key: string) => {
-    acc[key] = getDownload(release, key as keyof typeof BUILD_TARGETS);
+    acc.set(key, getDownload(release, key as keyof typeof BUILD_TARGETS));
     return acc;
-  }, {} as Record<string, string>);
+  }, new Map<string, string>);
+}
+
+export function getVersionNumber(release: Release) {
+  if(!release.name) {
+    return undefined;
+  }
+  const index = release.name.indexOf('v');
+  return index? release.name.substring(index + 1 ) : undefined;
 }

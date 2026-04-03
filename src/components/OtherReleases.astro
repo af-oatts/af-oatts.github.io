@@ -1,29 +1,13 @@
 ---
 import { GITHUB_OWNER, GITHUB_REPO } from "../lib/constants";
+import { getReleases } from "../services/github";
 
 // Fetch releases from GitHub API
 
-const response = await fetch(
-    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases`,
-    {
-        headers: {
-            Accept: "application/vnd.github+json",
-        },
-    },
-);
-
-let releases = await response.json();
-
-// Handle API errors
-if (!Array.isArray(releases)) {
-    console.error("GitHub API error:", releases);
-    releases = [];
-}
+const releases = await getReleases();
 
 // Helper function to find asset by pattern
-function findAsset(assets: any[], pattern: RegExp) {
-    return assets.find((asset: any) => pattern.test(asset.name));
-}
+
 
 // Helper function to format file size
 function formatSize(bytes: number) {
@@ -89,11 +73,6 @@ function getExtension(filename: string) {
                                 ></th
                             >
                             <th class="text-center"
-                                >Linux (Red Hat)<br /><span
-                                    class="text-muted small">.rpm</span
-                                ></th
-                            >
-                            <th class="text-center"
                                 >Linux (AppImage)<br /><span class="text-muted small"
                                     >.appimage</span
                                 ></th
@@ -110,71 +89,6 @@ function getExtension(filename: string) {
                                     .split("T")[0];
                                 const releaseTag = release.tag_name;
 
-                                // Define patterns for each platform - adjust these to match your naming convention
-                                // Your naming: boatts_0.1.0_x64.dmg, boatts_0.1.0_aarch64.dmg, boatts_x64.app.tar.gz, etc.
-                                const winX64 =
-                                    findAsset(
-                                        assets,
-                                        /(win|windows).*(x64|x86[_-]64|amd64).*\.(exe|zip)/i,
-                                    ) ||
-                                    findAsset(assets, /x64.*\.exe$/i) ||
-                                    findAsset(assets, /_x64\.(exe|msi)$/i);
-
-                                const winARM =
-                                    findAsset(
-                                        assets,
-                                        /(win|windows).*arm64.*\.(exe|zip)/i,
-                                    ) ||
-                                    findAsset(
-                                        assets,
-                                        /_aarch64\.(exe|msi)$/i,
-                                    ) ||
-                                    findAsset(
-                                        assets,
-                                        /aarch64.*windows.*\.(exe|msi)/i,
-                                    );
-
-                                // macOS ARM: prefer .app.tar.gz over .dmg
-                                const macARM =
-                                    findAsset(
-                                        assets,
-                                        /aarch64\.app\.tar\.gz$/i,
-                                    ) ||
-                                    findAsset(assets, /_aarch64\.dmg$/i) ||
-                                    findAsset(
-                                        assets,
-                                        /(macos|darwin).*(arm64|aarch64).*\.(dmg|app\.tar\.gz)/i,
-                                    );
-
-                                // macOS Intel: prefer .app.tar.gz over .dmg
-                                const macIntel =
-                                    findAsset(assets, /x64\.app\.tar\.gz$/i) ||
-                                    findAsset(assets, /_x64\.dmg$/i) ||
-                                    findAsset(
-                                        assets,
-                                        /(macos|darwin).*(x64|x86[_-]64|intel).*\.(dmg|app\.tar\.gz)/i,
-                                    );
-
-                                // Linux formats
-                                const linuxDeb =
-                                    findAsset(
-                                        assets,
-                                        /(amd64|x86[_-]64).*\.deb$/i,
-                                    ) ||
-                                    findAsset(assets, /_x64\.deb$/i) ||
-                                    findAsset(assets, /\.deb$/i);
-
-                                const linuxRpm =
-                                    findAsset(assets, /(x86[_-]64).*\.rpm$/i) ||
-                                    findAsset(assets, /_x64\.rpm$/i) ||
-                                    findAsset(assets, /\.rpm$/i);
-
-                                const appImage =
-                                    findAsset(assets, /\.appimage$/i) ||
-                                    findAsset(
-                                        assets,
-                                        /(x86[_-]64|amd64).*\.AppImage$/i,
-                                    );
 
                                 // Define platform metadata for each asset
                                 const platforms = [
@@ -182,11 +96,6 @@ function getExtension(filename: string) {
                                         asset: winX64,
                                         os: "windows",
                                         variant: "x64",
-                                    },
-                                    {
-                                        asset: winARM,
-                                        os: "windows",
-                                        variant: "arm",
                                     },
                                     {
                                         asset: macARM,
@@ -202,11 +111,6 @@ function getExtension(filename: string) {
                                         asset: linuxDeb,
                                         os: "linux",
                                         variant: "deb",
-                                    },
-                                    {
-                                        asset: linuxRpm,
-                                        os: "linux",
-                                        variant: "rpm",
                                     },
                                     {
                                         asset: appImage,

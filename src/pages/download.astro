@@ -40,11 +40,13 @@ import OtherReleases from "../components/OtherReleases.astro";
 
                 (sectionEl || document).addEventListener("downloaded", (e) => {
                     const os = e.detail?.os || "windows";
+                    const releaseTag = e.detail?.releaseTag;
+                    const asset = e.detail?.asset;
 
                     if (sectionEl) sectionEl.classList.add("is-fade-out");
 
                     setTimeout(() => {
-                        document.getElementById('invisibleRedirector')?.setAttribute('href', '/installed/' + os);
+                        document.getElementById('invisibleRedirector')?.setAttribute('href', `/installed/${os}/${releaseTag}/${asset}`);
                         document.getElementById('invisibleRedirector')?.click();
                     }, 1500);
                     setTimeout(() => {
@@ -54,8 +56,7 @@ import OtherReleases from "../components/OtherReleases.astro";
             </script>
         </DotBackground>
     </section>
-    <OtherReleases></OtherReleases>
-
+ 
 
 
 

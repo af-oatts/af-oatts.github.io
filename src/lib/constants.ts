@@ -25,3 +25,10 @@ export const OS_LABELS = {
   MAC_OS_INTEL: "MacOS (Intel)",
   LINUX: "Linux"
 }
+
+export enum BuildTarget {
+  MacOSArm,
+  MacOsIntel,
+  Linux,
+  Windows
+}
