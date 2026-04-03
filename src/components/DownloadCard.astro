@@ -117,159 +117,162 @@ const deb = getDebAssets(latestRelease.assets);
 
     <div class="d-flex justify-content-between align-items-center mt-3">
       <span class="text-body-secondary small">{versionNumber}</span>
-      <a
-        id="checksumsLink"
-        class="link-light link-underline-opacity-25 small"
-        href="/releases"
-      >
-        Checksums & notes
-      </a>
     </div>
   </div>
-</div>
 
-<style>
-  .dl-card-wrap {
-    position: relative;
-    display: grid;
-    place-items: center;
-  }
-  .dl-card {
-    position: relative;
-    z-index: 1;
-    width: min(560px, 92vw);
-    border-radius: 20px;
+  <style>
+    .dl-card-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+    .dl-card {
+      position: relative;
+      z-index: 1;
+      width: min(560px, 92vw);
+      border-radius: 20px;
 
-    background: var(--bs-body-bg);
+      background: var(--bs-body-bg);
 
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
-  }
-  .dl-card-wrap::after {
-    content: "";
-    position: absolute;
-    inset: -84px;
-    pointer-events: none;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+    }
+    .dl-card-wrap::after {
+      content: "";
+      position: absolute;
+      inset: -84px;
+      pointer-events: none;
 
-    z-index: 0;
+      z-index: 0;
 
-    background: radial-gradient(
-      140% 120% at 50% 50%,
-      var(--bs-body-bg) 0%,
-      color-mix(in srgb, var(--bs-body-bg) 85%, transparent) 55%,
-      transparent 85%
-    );
-    filter: blur(28px);
-  }
-  .os-pill {
-    user-select: none;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    color: #1a3a6b;
-    background: rgba(94, 160, 255, 0.12);
-  }
+      background: radial-gradient(
+        140% 120% at 50% 50%,
+        var(--bs-body-bg) 0%,
+        color-mix(in srgb, var(--bs-body-bg) 85%, transparent) 55%,
+        transparent 85%
+      );
+      filter: blur(28px);
+    }
+    .os-pill {
+      user-select: none;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      color: #fffff;
+      background: rgba(94, 160, 255, 0.12);
+    }
 
-  [data-bs-theme="dark"] .os-pill {
-    border-color: rgba(255, 255, 255, 0.08);
-    color: #cfe0ff;
-    background: rgba(94, 160, 255, 0.08);
-  }
-  .os-pill:has(input:disabled) {
-    opacity: 0.4;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-  .os-pill input {
-    display: none;
-  }
-  .os-pill.active {
-    color: #0b0f19;
-    background: #5ea0ff;
-    border-color: transparent;
-  }
-</style>
+    [data-bs-theme="dark"] .os-pill {
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      background: rgba(94, 160, 255, 0.12);
+    }
+    .os-pill:has(input:disabled) {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .os-pill input {
+      display: none;
+    }
+    .os-pill.active {
+      color: #0b0f19;
+      background: #5ea0ff;
+      border-color: transparent;
+    }
+  </style>
 
-<script
-  is:inline
-  define:vars={{ BUILD_TARGETS, tagName, macArm, macIntel, appimage, msi, exe }}
->
-  function detectOS() {
-    const ua = navigator.userAgent || "";
-    const plat = navigator.platform || "";
-    if (/Windows/i.test(ua) || /Win/i.test(plat))
+  <script
+    is:inline
+    define:vars={{
+      BUILD_TARGETS,
+      tagName,
+      macArm,
+      macIntel,
+      appimage,
+      msi,
+      exe,
+    }}
+  >
+    function detectOS() {
+      const ua = navigator.userAgent || "";
+      const plat = navigator.platform || "";
+      if (/Windows/i.test(ua) || /Win/i.test(plat))
+        return BUILD_TARGETS.WINDOWS_EXE;
+      if (/Mac/i.test(ua) || /Mac/i.test(plat)) {
+        const isArmHint = /Apple|ARM|aarch64|arm64/i.test(ua);
+        return isArmHint
+          ? BUILD_TARGETS.MAC_OS_ARM
+          : BUILD_TARGETS.MAC_OS_INTEL;
+      }
+      if (/Linux|X11/i.test(ua)) return BUILD_TARGETS.LINUX;
       return BUILD_TARGETS.WINDOWS_EXE;
-    if (/Mac/i.test(ua) || /Mac/i.test(plat)) {
-      const isArmHint = /Apple|ARM|aarch64|arm64/i.test(ua);
-      return isArmHint ? BUILD_TARGETS.MAC_OS_ARM : BUILD_TARGETS.MAC_OS_INTEL;
     }
-    if (/Linux|X11/i.test(ua)) return BUILD_TARGETS.LINUX;
-    return BUILD_TARGETS.WINDOWS_EXE;
-  }
 
-  function autoselectAsset() {
-    switch (selectedOS) {
-      case BUILD_TARGETS.MAC_OS_ARM:
-        return macArm[0].name;
-      case BUILD_TARGETS.MAC_OS_INTEL:
-        return macIntel[0].name;
-      case BUILD_TARGETS.WINDOWS_EXE:
-        return exe[0].name;
-      case BUILD_TARGETS.WINDOWS_MSI:
-        return msi[0].name;
-      case BUILD_TARGETS.LINUX:
-        return appimage[0].name;
+    function autoselectAsset() {
+      switch (selectedOS) {
+        case BUILD_TARGETS.MAC_OS_ARM:
+          return macArm[0].name;
+        case BUILD_TARGETS.MAC_OS_INTEL:
+          return macIntel[0].name;
+        case BUILD_TARGETS.WINDOWS_EXE:
+          return exe[0].name;
+        case BUILD_TARGETS.WINDOWS_MSI:
+          return msi[0].name;
+        case BUILD_TARGETS.LINUX:
+          return appimage[0].name;
+      }
     }
-  }
 
-  function autoselectDownloadURL() {
-    switch (selectedOS) {
-      case BUILD_TARGETS.MAC_OS_ARM:
-        return macArm[0].browser_download_url;
-      case BUILD_TARGETS.MAC_OS_INTEL:
-        return macIntel[0].browser_download_url;
-      case BUILD_TARGETS.WINDOWS_EXE:
-        return exe[0].browser_download_url;
-      case BUILD_TARGETS.WINDOWS_MSI:
-        return msi[0].browser_download_url;
-      case BUILD_TARGETS.LINUX:
-        return appimage[0].browser_download_url;
+    function autoselectDownloadURL() {
+      switch (selectedOS) {
+        case BUILD_TARGETS.MAC_OS_ARM:
+          return macArm[0].browser_download_url;
+        case BUILD_TARGETS.MAC_OS_INTEL:
+          return macIntel[0].browser_download_url;
+        case BUILD_TARGETS.WINDOWS_EXE:
+          return exe[0].browser_download_url;
+        case BUILD_TARGETS.WINDOWS_MSI:
+          return msi[0].browser_download_url;
+        case BUILD_TARGETS.LINUX:
+          return appimage[0].browser_download_url;
+      }
     }
-  }
 
-  const osGroup = document.getElementById("osGroup");
-  const downloadBtn = document.getElementById("downloadBtn");
-  let selectedOS = detectOS();
-  let selectedAsset = autoselectAsset();
-  let selectedDownloadURL = autoselectDownloadURL();
+    const osGroup = document.getElementById("osGroup");
+    const downloadBtn = document.getElementById("downloadBtn");
+    let selectedOS = detectOS();
+    let selectedAsset = autoselectAsset();
+    let selectedDownloadURL = autoselectDownloadURL();
 
-  function setActive(osKey, asset, download) {
-    selectedOS = osKey;
-    selectedAsset = asset;
-    selectedDownloadURL = download;
-    osGroup.querySelectorAll(".os-pill").forEach((lbl) => {
-      const active = lbl.getAttribute("data-os") === osKey;
-      lbl.classList.toggle("active", active);
-      const input = lbl.querySelector("input");
-      if (input) input.checked = active;
+    function setActive(osKey, asset, download) {
+      selectedOS = osKey;
+      selectedAsset = asset;
+      selectedDownloadURL = download;
+      osGroup.querySelectorAll(".os-pill").forEach((lbl) => {
+        const active = lbl.getAttribute("data-os") === osKey;
+        lbl.classList.toggle("active", active);
+        const input = lbl.querySelector("input");
+        if (input) input.checked = active;
+      });
+      downloadBtn.href = selectedDownloadURL;
+    }
+
+    setActive(selectedOS, selectedAsset, selectedDownloadURL);
+
+    osGroup.addEventListener("click", (e) => {
+      const lbl = e.target.closest(".os-pill");
+      if (!lbl) return;
+      const osKey = lbl.getAttribute("data-os");
+      const asset = lbl.getAttribute("data-asset");
+      const download = lbl.getAttribute("data-download");
+      if (osKey && asset && download) setActive(osKey, asset, download);
     });
-    downloadBtn.href = selectedDownloadURL;
-  }
 
-  setActive(selectedOS, selectedAsset, selectedDownloadURL);
-
-  osGroup.addEventListener("click", (e) => {
-    const lbl = e.target.closest(".os-pill");
-    if (!lbl) return;
-    const osKey = lbl.getAttribute("data-os");
-    const asset = lbl.getAttribute("data-asset");
-    const download = lbl.getAttribute("data-download");
-    if (osKey && asset && download) setActive(osKey, asset, download);
-  });
-
-  downloadBtn.addEventListener("click", () => {
-    const ev = new CustomEvent("downloaded", {
-      detail: { releaseTag: tagName, os: selectedOS, asset: selectedAsset },
-      bubbles: true,
+    downloadBtn.addEventListener("click", () => {
+      const ev = new CustomEvent("downloaded", {
+        detail: { releaseTag: tagName, os: selectedOS, asset: selectedAsset },
+        bubbles: true,
+      });
+      downloadBtn.dispatchEvent(ev);
     });
-    downloadBtn.dispatchEvent(ev);
-  });
-</script>
+  </script>
+</div>
