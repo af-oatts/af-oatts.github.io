@@ -19,11 +19,11 @@ export const FILE_REGEX = {
 };
 
 export const OS_LABELS = {
-  WINDOWS_EXE: "Windows",
-  WINDOWS_MSI: "Windows",
-  MAC_OS_ARM: "MacOS (Apple Silicon)",
-  MAC_OS_INTEL: "MacOS (Intel)",
-  LINUX: "Linux"
+  windows_exe: "Windows",
+  windows_msi: "Windows",
+  macos_arm: "MacOS (Apple Silicon)",
+  macos_intel: "MacOS (Intel)",
+  linux_appimage: "Linux"
 }
 
 export enum BuildTarget {

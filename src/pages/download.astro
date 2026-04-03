@@ -6,13 +6,12 @@ import Footer from "../components/Footer.astro";
 import DownloadCard from "../components/DownloadCard.astro";
 import Downloaded from "../components/Downloaded.astro";
 import DownloadRoot from "../layouts/DownloadRoot.astro";
-import {navigate} from 'astro:transitions/client';
+import { navigate } from "astro:transitions/client";
 import OtherReleases from "../components/OtherReleases.astro";
 ---
 
 <DownloadRoot>
-
-    <a id="invisibleRedirector" style="display: none;" href="/installed/windows"></a>
+    <a id="invisibleRedirector" style="display: none;" href="/installed"></a>
     <section style="height:100vh;">
         <DotBackground fadeInset={400}>
             <!-- BEFORE view -->
@@ -20,7 +19,6 @@ import OtherReleases from "../components/OtherReleases.astro";
                 <DownloadCard />
             </div>
 
-          
             <style>
                 .transition-fade {
                     transition: opacity 1.5s ease;
@@ -31,34 +29,32 @@ import OtherReleases from "../components/OtherReleases.astro";
                 }
             </style>
 
-            <script is:inline define:vars={{navigate}}>
-
+            <script is:inline define:vars={{ navigate }}>
                 const sectionEl =
                     document.currentScript.closest("section") ||
                     document.querySelector("section");
                 if (sectionEl) sectionEl.classList.add("transition-fade");
 
                 (sectionEl || document).addEventListener("downloaded", (e) => {
-                    const os = e.detail?.os || "windows";
-                    const releaseTag = e.detail?.releaseTag;
-                    const asset = e.detail?.asset;
+                    const os = encodeURIComponent(e.detail?.os);
+                    const releaseTag = encodeURIComponent(e.detail?.releaseTag);
+                    const asset = encodeURIComponent(e.detail?.asset);
 
                     if (sectionEl) sectionEl.classList.add("is-fade-out");
 
                     setTimeout(() => {
-                        document.getElementById('invisibleRedirector')?.setAttribute('href', `/installed/${os}/${releaseTag}/${asset}`);
-                        document.getElementById('invisibleRedirector')?.click();
+                        document
+                            .getElementById("invisibleRedirector")
+                            ?.setAttribute(
+                                "href",
+                                `/installed/${os}?release=${releaseTag}&asset=${asset}`,
+                            );
+                        document.getElementById("invisibleRedirector")?.click();
                     }, 1500);
-                    setTimeout(() => {
-                        
-                    }, 1600)
+                    setTimeout(() => {}, 1600);
                 });
             </script>
         </DotBackground>
     </section>
-    <OtherReleases></OtherReleases>
-
-
-
-
+    <OtherReleases />
 </DownloadRoot>

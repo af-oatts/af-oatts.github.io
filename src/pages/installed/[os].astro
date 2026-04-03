@@ -1,0 +1,19 @@
+---
+import type { GetStaticPaths } from "astro";
+import Downloaded from "../../components/Downloaded.astro";
+import DownloadRoot from "../../layouts/DownloadRoot.astro";
+import { BUILD_TARGETS } from "../../lib/constants";
+
+export const getStaticPaths = (() => {
+    return Object.values(BUILD_TARGETS).map((target) => ({
+        params: { os: target },
+    }));
+}) satisfies GetStaticPaths;
+const { os } = Astro.params;
+---
+
+<div style="height: 101vh;">
+    <DownloadRoot>
+        <Downloaded os={os} />
+    </DownloadRoot>
+</div>
