@@ -1,13 +1,21 @@
 ---
 import { GITHUB_OWNER, GITHUB_REPO } from "../lib/constants";
-import { getReleases } from "../services/github";
+import {
+    getAppimageAssets,
+    getDebAssets,
+    getExeWindowsAssets,
+    getMacosArmAssets,
+    getMacosIntelAssets,
+    getMSIWindowsAssets,
+    getReleases,
+    type Asset,
+} from "../services/github";
 
 // Fetch releases from GitHub API
 
 const releases = await getReleases();
 
 // Helper function to find asset by pattern
-
 
 // Helper function to format file size
 function formatSize(bytes: number) {
@@ -48,23 +56,23 @@ function getExtension(filename: string) {
                                 >Release</th
                             >
                             <th class="text-center"
-                                >Windows x64<br /><span class="text-muted small"
-                                    >.exe / .zip</span
+                                >Windows<br /><span class="text-muted small"
+                                    >.exe</span
                                 ></th
                             >
                             <th class="text-center"
-                                >Windows ARM64<br /><span
-                                    class="text-muted small">.exe</span
+                                >Windows<br /><span class="text-muted small"
+                                    >.msi</span
                                 ></th
                             >
                             <th class="text-center"
                                 >macOS Apple Silicon<br /><span
-                                    class="text-muted small">.dmg</span
+                                    class="text-muted small">.app.tar.gz</span
                                 ></th
                             >
                             <th class="text-center"
                                 >macOS Intel<br /><span class="text-muted small"
-                                    >.dmg</span
+                                    >.app.tar.gz</span
                                 ></th
                             >
                             <th class="text-center"
@@ -73,8 +81,8 @@ function getExtension(filename: string) {
                                 ></th
                             >
                             <th class="text-center"
-                                >Linux (AppImage)<br /><span class="text-muted small"
-                                    >.appimage</span
+                                >Linux (AppImage)<br /><span
+                                    class="text-muted small">.appimage</span
                                 ></th
                             >
                         </tr>
@@ -82,42 +90,37 @@ function getExtension(filename: string) {
 
                     <tbody>
                         {
-                            releases.slice(0, 10).map((release: any) => {
-                                const assets = release.assets || [];
-                                const date = new Date(release.published_at)
+                            releases.slice(0, 10).map((release) => {
+                                const date = new Date(release.published_at!)
                                     .toISOString()
                                     .split("T")[0];
                                 const releaseTag = release.tag_name;
+                                const assets: [string, Asset[]][] = [
+                                    [
+                                        "exe",
+                                        getExeWindowsAssets(release.assets),
+                                    ],
 
+                                    [
+                                        "msi",
+                                        getMSIWindowsAssets(release.assets),
+                                    ],
+                                    [
+                                        "macArm",
+                                        getMacosArmAssets(release.assets),
+                                    ],
+                                    [
+                                        "macIntel",
+                                        getMacosIntelAssets(release.assets),
+                                    ],
+                                    ["deb", getDebAssets(release.assets)],
+                                    [
+                                        "appimage",
+                                        getAppimageAssets(release.assets),
+                                    ],
+                                ];
 
                                 // Define platform metadata for each asset
-                                const platforms = [
-                                    {
-                                        asset: winX64,
-                                        os: "windows",
-                                        variant: "x64",
-                                    },
-                                    {
-                                        asset: macARM,
-                                        os: "macos",
-                                        variant: "arm",
-                                    },
-                                    {
-                                        asset: macIntel,
-                                        os: "macos",
-                                        variant: "x64",
-                                    },
-                                    {
-                                        asset: linuxDeb,
-                                        os: "linux",
-                                        variant: "deb",
-                                    },
-                                    {
-                                        asset: appImage,
-                                        os: "linux",
-                                        variant: "appimage",
-                                    },
-                                ];
 
                                 return (
                                     <tr>
@@ -135,11 +138,10 @@ function getExtension(filename: string) {
                                             </div>
                                         </th>
 
-                                        {platforms.map((platform, idx) => {
-                                            const asset = platform.asset;
-                                            const link = asset
-                                                ? `/installed/${platform.os}_${platform.variant}_${getExtension(asset.name)}/${releaseTag}/${asset.name}`
-                                                : "";
+                                        {assets.map(([os, assets]) => {
+                                            const asset = assets[0]; // TODO: Probably show every available one eventually.
+                                            const link =
+                                                asset.browser_download_url;
                                             return (
                                                 <td class="text-center">
                                                     {asset ? (
@@ -153,12 +155,13 @@ function getExtension(filename: string) {
                                                                     asset.size,
                                                                 )}
                                                             </a>
+                                                            {/* @ts-ignore */}
                                                             {asset.digest && (
                                                                 <a
-                                                                    href="#"
                                                                     class="checksum-link small d-block mt-1 js-copy"
                                                                     data-copy={
                                                                         getSHA256(
+                                                                            /* @ts-ignore */
                                                                             asset.digest,
                                                                         ) || ""
                                                                     }
