@@ -211,7 +211,28 @@ const steps = os.includes("windows")
     return;
   }
 
-  const retryURL = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${qpVersion}/${qpFilename}`;
+  const expectedPrefix = `/releases/download/`;
+  const base = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}`;
 
-  document.querySelectorAll('.retrybtn').forEach(el => el.href = retryURL);
+  let retryURL;
+  try {
+    retryURL = new URL(`${base}/releases/download/${qpVersion}/${qpFilename}`);
+  } catch {
+    console.error("Failed to construct URL.");
+    return;
+  }
+
+  if (
+    retryURL.origin !== "https://github.com" ||
+    !retryURL.pathname.startsWith(
+      `/${GITHUB_OWNER}/${GITHUB_REPO}${expectedPrefix}`,
+    )
+  ) {
+    console.error("Nice try. Take your lousy path traversal exploit somewhere else.");
+    return;
+  }
+
+  document
+    .querySelectorAll(".retrybtn")
+    .forEach((el) => (el.href = retryURL.href));
 </script>
