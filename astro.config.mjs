@@ -9,10 +9,5 @@ import partytown from "@astrojs/partytown";
 export default defineConfig({
   output: "static",
   integrations: [
-    partytown({
-      config: {
-        forward: ["dataLayer.push", "gtag"],
-      },
-    }),
   ],
 });
