@@ -1,14 +1,10 @@
 ---
-import CookieBanner from "../components/CookieBanner.astro";
-import GoogleAnalytics from "../components/GoogleAnalytics.astro";
-
 const { title = "OATTS" } = Astro.props;
 ---
 
 <html lang="en">
     <head>
-        <GoogleAnalytics />
-        <slot name="head" />
+        <slot name="head"/>
         <meta charset="utf-8" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width" />
@@ -30,6 +26,7 @@ const { title = "OATTS" } = Astro.props;
         <script is:inline>
             function syncTheme() {
                 try {
+                    
                     var saved = localStorage.getItem("theme");
                     var parsed = saved ? JSON.parse(saved) : "system";
                     var prefersDark = matchMedia(
@@ -49,7 +46,7 @@ const { title = "OATTS" } = Astro.props;
                 } catch {}
             }
             syncTheme();
-            document.addEventListener("astro:after-swap", syncTheme);
+            document.addEventListener('astro:after-swap', syncTheme);
         </script>
         <style>
             :root {
@@ -62,5 +59,6 @@ const { title = "OATTS" } = Astro.props;
         </title>
     </head>
     <slot />
-    <CookieBanner />
+
+
 </html>

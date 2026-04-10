@@ -8,42 +8,4 @@ const year = new Date().getFullYear();
         Distribution Statement A: Approved For Public Release. AFRL, 2025-4499,
         Cleared 08 Sep 2025
     </div>
-    <div class="container mt-2">
-        <button
-            id="cookie-preferences-btn"
-            class="btn btn-link btn-sm text-muted p-0"
-            style="font-size: inherit; text-decoration: underline dotted;"
-            type="button"
-        >
-            Cookie Preferences
-        </button>
-    </div>
-
-    <div class="container mt-2">
-        <a
-            class="btn btn-link btn-sm text-muted p-0"
-            style="font-size: inherit; text-decoration: underline dotted;"
-            href="/legal/privacy"
-        >
-            Website Privacy Policy
-        </a>
-    </div>
 </footer>
-
-<script is:inline>
-    (function () {
-        function initCookiePrefsBtn() {
-            var btn = document.getElementById("cookie-preferences-btn");
-            if (!btn || btn.dataset.init) return;
-            btn.dataset.init = "1";
-            btn.addEventListener("click", function () {
-                if (typeof window.showCookieBanner === "function") {
-                    window.showCookieBanner();
-                }
-            });
-        }
-
-        initCookiePrefsBtn();
-        document.addEventListener("astro:after-swap", initCookiePrefsBtn);
-    })();
-</script>
