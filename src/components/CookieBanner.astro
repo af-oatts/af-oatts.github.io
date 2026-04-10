@@ -1,0 +1,89 @@
+---
+
+---
+
+<div
+    id="cookie-banner"
+    class="position-fixed bottom-0 start-0 p-3"
+    style="z-index: 1055; display: none; max-width: 600px;"
+>
+    <div class="card shadow border-0">
+        <div
+            class="card-body d-flex flex-column flex-sm-row align-items-sm-center gap-3 py-3"
+        >
+            <div class="flex-grow-1">
+                <h6 class="card-title mb-1 fw-semibold">
+                    <i class="bi bi-cookie me-2"></i>Cookie Consent
+                </h6>
+                <p class="card-text small text-muted mb-0">
+                    We use Google Analytics. <strong>Decline</strong> for anonymous,
+                    cookieless analytics only.
+                    <strong>Accept</strong> to enable full session analytics with
+                    cookies. Change your preference any time in the footer.
+                </p>
+            </div>
+            <div class="d-flex gap-2 flex-shrink-0">
+                <button
+                    id="cookie-decline"
+                    class="btn btn-outline-secondary btn-sm"
+                    type="button"
+                >
+                    Decline
+                </button>
+                <button
+                    id="cookie-accept"
+                    class="btn btn-sm text-white"
+                    style="background-color: var(--brand-purple); border-color: var(--brand-purple);"
+                    type="button"
+                >
+                    Accept
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script is:inline>
+    (function () {
+        function initCookieBanner() {
+            var banner = document.getElementById("cookie-banner");
+            if (!banner) return;
+
+            if (!banner.dataset.init) {
+                banner.dataset.init = "1";
+
+                document
+                    .getElementById("cookie-accept")
+                    .addEventListener("click", function () {
+                        localStorage.setItem("cookie-consent", "accepted");
+                        banner.style.display = "none";
+                        document.dispatchEvent(
+                            new CustomEvent("cookie-consent-accepted"),
+                        );
+                    });
+
+                document
+                    .getElementById("cookie-decline")
+                    .addEventListener("click", function () {
+                        localStorage.setItem("cookie-consent", "declined");
+                        banner.style.display = "none";
+                        document.dispatchEvent(
+                            new CustomEvent("cookie-consent-declined"),
+                        );
+                    });
+            }
+
+            banner.style.display = localStorage.getItem("cookie-consent")
+                ? "none"
+                : "block";
+
+            window.showCookieBanner = function () {
+                localStorage.removeItem("cookie-consent");
+                banner.style.display = "block";
+            };
+        }
+
+        initCookieBanner();
+        document.addEventListener("astro:after-swap", initCookieBanner);
+    })();
+</script>
