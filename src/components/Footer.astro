@@ -1,7 +1,7 @@
 ---
 const year = new Date().getFullYear();
 ---
- 
+
 <footer class="py-5 text-center text-muted small">
     <div class="container">© {year} The OATTS Authors.</div>
     <div class="container">
@@ -18,8 +18,18 @@ const year = new Date().getFullYear();
             Cookie Preferences
         </button>
     </div>
+
+    <div class="container mt-2">
+        <a
+            class="btn btn-link btn-sm text-muted p-0"
+            style="font-size: inherit; text-decoration: underline dotted;"
+            href="/legal/privacy"
+        >
+            Website Privacy Policy
+        </a>
+    </div>
 </footer>
- 
+
 <script is:inline>
     (function () {
         function initCookiePrefsBtn() {
@@ -32,7 +42,7 @@ const year = new Date().getFullYear();
                 }
             });
         }
- 
+
         initCookiePrefsBtn();
         document.addEventListener("astro:after-swap", initCookiePrefsBtn);
     })();

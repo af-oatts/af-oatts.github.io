@@ -1,5 +1,5 @@
 ---
-import { getCollection, getEntry } from "astro:content";
+import { getCollection, getEntry, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import Footer from "../../components/Footer.astro";
 import Navbar from "../../components/Navbar.astro";
@@ -7,21 +7,17 @@ import Root from "../../layouts/Root.astro";
 
 export async function getStaticPaths() {
     const legalDocs = await getCollection("legal");
+    console.log(legalDocs);
+    
 
     return legalDocs.map((doc: CollectionEntry<"legal">) => ({
-        params: { document: doc.slug },
+        params: { document: doc.id.replace(/^legal\//, "") },
         props: { doc },
     }));
 }
 
-const { document } = Astro.params;
-const entry = await getEntry("legal", document);
-
-if (!entry) {
-    return Astro.redirect("/404");
-}
-
-const { Content } = await entry.render();
+const { doc } = Astro.props;
+const { Content } = await render(doc);
 ---
 
 <Root>
@@ -29,12 +25,15 @@ const { Content } = await entry.render();
         <Navbar />
         <main class="legal-content">
             <article class="container">
-                <h1>{entry.data.title}</h1>
-                {entry.data.lastUpdated && (
-                    <p class="last-updated">
-                        Last updated: {entry.data.lastUpdated.toLocaleDateString()}
-                    </p>
-                )}
+                <h1>{doc.data.title}</h1>
+                {
+                    doc.data.lastUpdated && (
+                        <p class="last-updated">
+                            Last updated:{" "}
+                            {doc.data.lastUpdated.toLocaleDateString()}
+                        </p>
+                    )
+                }
                 <Content />
             </article>
         </main>
