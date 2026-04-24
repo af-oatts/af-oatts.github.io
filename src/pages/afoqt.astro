@@ -1,0 +1,85 @@
+---
+import Footer from "../components/Footer.astro";
+import Navbar from "../components/Navbar.astro";
+import AFOQTSection from "../components/sections/AFOQTSection.astro";
+import FeaturesSection from "../components/sections/FeaturesSection.astro";
+import MainHeroSection from "../components/sections/MainHeroSection.astro";
+import Root from "../layouts/Root.astro";
+---
+
+<Root>
+	<body>
+		<div class="main-content">
+			<Navbar />
+			<MainHeroSection />
+			<FeaturesSection />
+
+			<section class="section-muted py-5">
+				<AFOQTSection />
+			</section>
+		</div>
+
+		<Footer />
+	</body>
+
+	<script is:inline>
+		alert("This is an official US Air Force product.");
+	</script>
+
+	<style>
+		:root {
+			--hero-grad-start: #7b2ff7;
+			--hero-grad-end: #f107a3;
+		}
+		.theme-transition * {
+			transition:
+				background-color 0.25s ease,
+				color 0.25s ease,
+				border-color 0.25s ease,
+				box-shadow 0.25s ease,
+				fill 0.25s ease,
+				stroke 0.25s ease;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.theme-transition * {
+				transition: none !important;
+			}
+		}
+
+		.main-content {
+			background: radial-gradient(
+					1200px 400px at right -100px,
+					rgba(111, 66, 193, 0.15),
+					transparent
+				),
+				radial-gradient(
+					600px 300px at 30% 10%,
+					rgba(123, 47, 247, 0.1),
+					transparent
+				);
+		}
+
+		/* Install section */
+		.section-muted {
+			background: var(--soft-bg);
+		}
+
+		:global([data-bs-theme="dark"]) .section-muted {
+			background: #121622;
+		}
+
+		:global([data-bs-theme="dark"]) .main-content {
+			background: radial-gradient(
+					1200px 400px at right -100px,
+					rgba(123, 47, 247, 0.12),
+					transparent
+				),
+				radial-gradient(
+					600px 300px at 30% 10%,
+					rgba(123, 47, 247, 0.08),
+					transparent
+				);
+		}
+	</style>
+</Root>
